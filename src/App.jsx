@@ -7,6 +7,7 @@ import MainContainer from './pages/main';
 import Companies from './pages/Companies';
 import CompanyInfo from './pages/CompanyInfo';
 import People from './pages/People';
+import Vehicle from './pages/Vehicles';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/company" element={<Companies />} />
           <Route path="/people" element={<People />} />
           <Route path="/company/:id" element={<CompanyInfo />} />
+          <Route path="/vehicles" element={<Vehicle />} />
 
         </Route>
       </Routes>

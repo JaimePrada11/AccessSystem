@@ -89,7 +89,7 @@ const Menu = () => {
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'vehiculos' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('vehiculos')}>
               <FaBiking className="mr-3" />
-              {isOpen && <Link to="/vehiculos" className="flex items-center">Vehicles</Link>}
+              {isOpen && <Link to="/vehicles" className="flex items-center">Vehicles</Link>}
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'equipos' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('equipos')}>
               <FaLaptop className="mr-3" />
@@ -114,7 +114,7 @@ const Menu = () => {
           <Link to="/ingresos" className="flex flex-col items-center">
             <MdOutlineExitToApp size={32} />
           </Link>
-          <Link to="/vehiculos" className="flex flex-col items-center">
+          <Link to="/vehicles" className="flex flex-col items-center">
             <FaBiking size={32} />
           </Link>
           <Link to="/equipos" className="flex flex-col items-center">
