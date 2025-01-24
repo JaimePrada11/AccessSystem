@@ -43,7 +43,7 @@ const Table = ({ columns, data, onEdit, onDelete }) => {
                                 {columns.map((col) => (
                                     <td key={col.accessor} className="px-4 py-2 text-center text-gray-600">{row[col.accessor]}</td>
                                 ))}
-                                <td className="px-4 py-2 text-left flex space-x-2 items-center">
+                                <td className="px-4 py-2 text-left flex flex-col md:flex-row  justify-center space-x-2 items-center">
                                     <button
                                         onClick={() => onEdit(row)}
                                         className="px-3 py-1 rounded-md flex items-center transition-transform duration-300 hover:scale-105"

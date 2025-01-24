@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { AiOutlineUser, AiOutlineIdcard, AiOutlinePhone } from 'react-icons/ai';
-import VehicleForm from '../components/VehicleForm';
-import EquipmentForm from '../components/EquipmentForm';
+
 
 const People = () => {
   const [formData, setFormData] = useState({
@@ -70,8 +69,7 @@ const People = () => {
           </button>
         </form>
       </section>
-      <VehicleForm/>
-      <EquipmentForm/>
+
     </div>
   );
 };

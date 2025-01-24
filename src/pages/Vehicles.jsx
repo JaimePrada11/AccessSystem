@@ -267,7 +267,7 @@ export default function Vehicle() {
                     </div>
                 </div>
 
-                <div className="mt-8">
+                <div className="mt-8  mb-6 ">
                     <Table
                         columns={columns}
                         data={filteredData}

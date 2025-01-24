@@ -95,7 +95,7 @@ const Companies = () => {
           alt="Building"
         />
       </div>
-      <div className="w-full flex flex-row justify-between items-center gap-4 p-4">
+      <div className="w-full flex flex-col  md:flex-row  justify-center md:justify-between items-center gap-4 p-4">
         <div className="relative flex items-center w-full max-w-md">
           <CiSearch className="absolute left-3 text-gray-500" size={24} />
           <input
@@ -106,7 +106,7 @@ const Companies = () => {
             className="w-64 h-10 pl-10 pr-4 py-2 bg-white text-gray-800 placeholder-gray-500 rounded-md shadow focus:outline-none focus:ring-2 focus:ring-blue-600"
           />
         </div>
-        <div className="w-full max-w-md flex justify-end">
+        <div className="w-full max-w-md flex justify-center md:justify-end">
           <button 
             onClick={() => setModalOpen(true)}
             className="w-32 h-10 bg-blue-600 text-white px-4 rounded-md flex items-center justify-center gap-2 hover:bg-blue-700 transition-transform transform hover:scale-105">

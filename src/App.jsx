@@ -8,6 +8,7 @@ import Companies from './pages/Companies';
 import CompanyInfo from './pages/CompanyInfo';
 import People from './pages/People';
 import Vehicle from './pages/Vehicles';
+import Equipments from './pages/Equipments';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/people" element={<People />} />
           <Route path="/company/:id" element={<CompanyInfo />} />
           <Route path="/vehicles" element={<Vehicle />} />
+          <Route path="/equipments" element={<Equipments />} />
 
         </Route>
       </Routes>

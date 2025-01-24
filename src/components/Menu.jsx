@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaBuilding, FaBiking, FaLaptop, FaBars, FaTimes } from "react-icons/fa";
+import { FaBuilding, FaBiking, FaLaptop, FaBars, FaTimes, FaFileInvoiceDollar } from "react-icons/fa";
 import { SiParrotsecurity } from "react-icons/si";
-import { MdOutlineExitToApp } from "react-icons/md";
+import { MdOutlineExitToApp, MdCardMembership } from "react-icons/md";
 import { IoIosPeople } from "react-icons/io";
 import { PiSecurityCamera } from "react-icons/pi";
+
 
 const Menu = () => {
   const [isOpen, setIsOpen] = useState(true); // Inicialmente abierto en PCs
@@ -66,7 +67,7 @@ const Menu = () => {
 
         <div className="flex items-center justify-center h-16 relative z-10">
           <SiParrotsecurity className="text-3xl mr-2" />
-          {isOpen && <h1 className="text-2xl font-bold text-white">Entry System</h1>}
+          {isOpen && <Link to="/" className="text-2xl font-bold text-white">Entry System</Link>}
         </div>
 
         <nav className="flex-grow flex flex-col justify-between py-4 relative z-10">
@@ -93,7 +94,15 @@ const Menu = () => {
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'equipos' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('equipos')}>
               <FaLaptop className="mr-3" />
-              {isOpen && <Link to="/equipos" className="flex items-center">Equipments</Link>}
+              {isOpen && <Link to="/equipments" className="flex items-center">Equipments</Link>}
+            </li>
+            <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'equipos' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('equipos')}>
+              <MdCardMembership className="mr-3" />
+              {isOpen && <Link to="/equipments" className="flex items-center">Membership</Link>}
+            </li>
+            <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'equipos' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('equipos')}>
+              <FaFileInvoiceDollar className="mr-3" />
+              {isOpen && <Link to="/equipments" className="flex items-center">Invoices</Link>}
             </li>
           </ul>
         </nav>
@@ -117,8 +126,14 @@ const Menu = () => {
           <Link to="/vehicles" className="flex flex-col items-center">
             <FaBiking size={32} />
           </Link>
-          <Link to="/equipos" className="flex flex-col items-center">
+          <Link to="/equipments" className="flex flex-col items-center">
             <FaLaptop size={32} />
+          </Link>
+          <Link to="/vehicles" className="flex flex-col items-center">
+            <MdCardMembership size={32} />
+          </Link>
+          <Link to="/equipments" className="flex flex-col items-center">
+            <FaFileInvoiceDollar size={32} />
           </Link>
         </div>
       )}
