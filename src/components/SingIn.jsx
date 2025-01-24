@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AiOutlineUser, AiOutlineIdcard, AiOutlinePhone } from 'react-icons/ai';
 import { FaRegCalendarAlt } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
@@ -35,7 +36,7 @@ const SignIn = () => {
 
   return (
     <div className="flex items-center  justify-center min-h-screen bg-gradient-to-br from-black to-blue-900">
-      <section className="bg-white/10 mt-6 backdrop-blur-md bg-opacity-20 p-8 rounded-lg shadow-lg w-full max-w-md">
+      <section className="bg-white/10 mt-6 mb-5 backdrop-blur-md bg-opacity-20 p-8 rounded-lg shadow-lg w-full max-w-md">
         <form className="space-y-6 " onSubmit={handleSubmit}>
           <h2 className="text-3xl text-white font-bold text-center text-gray-800 uppercase">Sign Up</h2>
           <div className="space-y-5">
@@ -70,12 +71,9 @@ const SignIn = () => {
           </button>
           <div className="flex flex-row items-center justify-center mt-4 text-gray-200">
             <p className="mr-2">Already have an account?</p>
-            <button 
-              type="button" 
-              className="text-blue-400 font-semibold hover:text-blue-700 transition duration-300 cursor-pointer"
-            >
+            <Link to="/login" className="text-blue-400 font-semibold hover:text-blue-700 transition duration-300 cursor-pointer">
               Login
-            </button>
+            </Link>
           </div>
         </form>
       </section>
