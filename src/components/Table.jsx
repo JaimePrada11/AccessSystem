@@ -48,7 +48,7 @@ const Table = ({ columns, data, onEdit, onDelete }) => {
                                         onClick={() => onEdit(row)}
                                         className="px-3 py-1 rounded-md flex items-center transition-transform duration-300 hover:scale-105"
                                     >
-                                        <FaEdit className="mr-1 text-yellow-500 text-xl" />
+                                        <FaEdit className="mr-1 text-blue-500 text-xl" />
                                     </button>
                                     <button
                                         onClick={() => onDelete(row)}
