@@ -73,11 +73,11 @@ const Menu = () => {
           <ul className="space-y-2 text-white">
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'empresas' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('empresas')}>
               <FaBuilding className="mr-3" />
-              {isOpen && <Link to="/empresas" className="flex items-center">Companies</Link>}
+              {isOpen && <Link to="/company" className="flex items-center">Companies</Link>}
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'personas' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('personas')}>
               <IoIosPeople className="mr-3" />
-              {isOpen && <Link to="/personas" className="flex items-center">People</Link>}
+              {isOpen && <Link to="/people" className="flex items-center">People</Link>}
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'celadores' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('celadores')}>
               <PiSecurityCamera className="mr-3" />
@@ -102,10 +102,10 @@ const Menu = () => {
       {/* Mobile Bottom Navbar */}
       {isMobile && (
         <div className="fixed bottom-0 left-0 w-full bg-blue-900 text-white flex justify-around py-4 z-20 rounded-t-2xl">
-          <Link to="/empresas" className="flex flex-col items-center">
+          <Link to="/company" className="flex flex-col items-center">
             <FaBuilding size={32} />
           </Link>
-          <Link to="/personas" className="flex flex-col items-center">
+          <Link to="/people" className="flex flex-col items-center">
             <IoIosPeople size={32} />
           </Link>
           <Link to="/celadores" className="flex flex-col items-center">

@@ -4,6 +4,9 @@ import Login from './components/Login';
 import SignIn from './components/SingIn';  
 import Layout from './layout';
 import MainContainer from './pages/main';
+import Companies from './pages/Companies';
+import CompanyInfo from './pages/CompanyInfo';
+import People from './pages/People';
 
 function App() {
   return (
@@ -13,6 +16,10 @@ function App() {
         <Route path="/signin" element={<SignIn />} />
         <Route element={<Layout />}>
           <Route path="/home" element={<MainContainer />} />
+          <Route path="/company" element={<Companies />} />
+          <Route path="/people" element={<People />} />
+          <Route path="/company/:id" element={<CompanyInfo />} />
+
         </Route>
       </Routes>
     </Router>
