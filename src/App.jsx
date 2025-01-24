@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import Login from './components/Login';
-import SignIn from './components/SingIn';
+import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Menu from './components/Menu';
+import Login from './components/Login';
+import SignIn from './components/SingIn';  
+import Layout from './layout';
+import MainContainer from './pages/main';
 
 function App() {
   return (
@@ -10,7 +11,9 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signin" element={<SignIn />} />
-        <Route path='/' element={<Menu/>} />
+        <Route element={<Layout />}>
+          <Route path="/home" element={<MainContainer />} />
+        </Route>
       </Routes>
     </Router>
   );
