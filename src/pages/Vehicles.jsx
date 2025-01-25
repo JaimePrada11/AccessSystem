@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { CiSearch } from "react-icons/ci";
-import Table from '../components/Table';
 import { IoMdAddCircle } from "react-icons/io";
 import Modal from '../components/Modal';
 
@@ -268,12 +267,7 @@ export default function Vehicle() {
                 </div>
 
                 <div className="mt-8  mb-6 ">
-                    <Table
-                        columns={columns}
-                        data={filteredData}
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                    />
+                
                 </div>
 
                 <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>

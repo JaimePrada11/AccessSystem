@@ -8,7 +8,7 @@ const Header = () => {
       setCurrentTime(new Date());
     }, 1000);
     
-    return () => clearInterval(timer); // Clean up the interval on component unmount
+    return () => clearInterval(timer); 
   }, []);
 
   const user = {
@@ -24,7 +24,7 @@ const Header = () => {
           <div
             className="w-64 h-10 pl-10 pr-4 py-2 text-gray-800 placeholder-gray-500 rounded-md  focus:outline-none focus:ring-0  flex items-center"
           >
-            {currentTime.toLocaleTimeString()}
+            {currentTime.toLocaleTimeString()} {currentTime.toLocaleDateString()}
           </div>
         </div>
       </div>

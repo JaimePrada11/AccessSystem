@@ -3,6 +3,27 @@ import { AiOutlineUser, AiOutlineIdcard, AiOutlinePhone } from 'react-icons/ai';
 
 
 const People = () => {
+
+  const datas = [
+    {
+        name: "John Doe",
+        cedula: "123456789",
+        phone: "555-1234",
+        tipo: "Visitante",
+        companie: "ACME Corp",
+        carnet: "123-456-789",
+        image: "https://images.ctfassets.net/lh3zuq09vnm2/yBDals8aU8RWtb0xLnPkI/19b391bda8f43e16e64d40b55561e5cd/How_tracking_user_behavior_on_your_website_can_improve_customer_experience.png"
+    }
+];
+
+const mappedData = datas.map(item => ({
+    image : item.image,
+    primary: item.name,
+    secondary: `CC. ${item.cedula}  Phone ${item.phone}`,
+    tertiary: ` ${item.tipo},  ${item.companie}`,
+    additional: `Carnet: ${item.carnet}`
+}));
+
   const [formData, setFormData] = useState({
     name: "",
     cedula: "",

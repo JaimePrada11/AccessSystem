@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { CiSearch } from "react-icons/ci";
-import Table from '../components/Table';
 import { IoMdAddCircle } from "react-icons/io";
 import Modal from '../components/Modal';
 import Form from '../components/Form';
 import CommonLayout from '../CommonLayout';
-
-
+import List from '../components/Cards/List';
+import CardItem from '../components/Cards/CardItem';
 const Equipments = () => {
     const [data, setData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -34,6 +33,14 @@ const Equipments = () => {
         }
     ];
 
+    const mappedData = initialData.map(item => ({
+        image: item.image,
+        primary: item.serial,
+        secondary: `Fecha de Registro: ${item.registrationDate}`,
+        tertiary: `Descripción: ${item.description}`,
+        additional: `Dueño: ${item.owner}`
+    }));
+
     useEffect(() => {
         setData(initialData);
         setFilteredData(initialData);
@@ -57,13 +64,6 @@ const Equipments = () => {
         setFilteredData(filtered);
     }, [searchTerm, startDate, endDate, data]);
 
-    const columns = [
-        { Header: 'ID', accessor: 'id' },
-        { Header: 'Serial', accessor: 'serial' },
-        { Header: 'Registration Date', accessor: 'registrationDate' },
-        { Header: 'Owner', accessor: 'owner' },
-        { Header: 'Description', accessor: 'description' },
-    ];
 
     const handleSubmit = (newData) => {
         if (isEditing) {
@@ -99,23 +99,20 @@ const Equipments = () => {
             searchPlaceholder="Search by Serial"
             searchValue={searchTerm}
             onSearchChange={(e) => setSearchTerm(e.target.value)}
-            onAddNew={handleAddNew}
-            extraInputs={[
-                {
-                    type: 'date',
-                    value: startDate,
-                    onChange: (e) => setStartDate(e.target.value),
-                    className: 'w-40 h-10 p-2 border border-gray-300 rounded-md'
-                },
-                {
-                    type: 'date',
-                    value: endDate,
-                    onChange: (e) => setEndDate(e.target.value),
-                    className: 'w-40 h-10 p-2 border border-gray-300 rounded-md'
-                }
-            ]}
-        >
-            <Table columns={columns} data={filteredData} onEdit={handleEdit} onDelete={handleDelete} />
+            onAddNew={handleAddNew} >
+
+            <List>
+                {mappedData.map((item, index) => (
+                    <CardItem
+                        key={index}
+                        data={item}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                    />
+
+                ))}
+            </List>
+
             <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
                 <Form
                     fields={[

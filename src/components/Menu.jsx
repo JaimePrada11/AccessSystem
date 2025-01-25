@@ -98,7 +98,7 @@ const Menu = () => {
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'equipos' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('equipos')}>
               <MdCardMembership className="mr-3" />
-              {isOpen && <Link to="/equipments" className="flex items-center">Membership</Link>}
+              {isOpen && <Link to="/memberships" className="flex items-center">Membership</Link>}
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'equipos' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('equipos')}>
               <FaFileInvoiceDollar className="mr-3" />
@@ -129,10 +129,10 @@ const Menu = () => {
           <Link to="/equipments" className="flex flex-col items-center">
             <FaLaptop size={32} />
           </Link>
-          <Link to="/vehicles" className="flex flex-col items-center">
+          <Link to="/memberships" className="flex flex-col items-center">
             <MdCardMembership size={32} />
           </Link>
-          <Link to="/equipments" className="flex flex-col items-center">
+          <Link to="/invoice" className="flex flex-col items-center">
             <FaFileInvoiceDollar
              size={32} />
           </Link>

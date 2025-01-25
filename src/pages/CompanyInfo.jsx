@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { CiSearch } from "react-icons/ci";
-import Table from '../components/Table';
-import { IoMdAddCircle } from "react-icons/io";
+import List from '../components/Cards/List';
+import CardItem from '../components/Cards/CardItem';
 import Modal from '../components/Modal';
 import Form from '../components/Form';
 import CommonLayout from '../CommonLayout';
@@ -15,51 +14,22 @@ const CompanyInfo = () => {
     const [editData, setEditData] = useState({ name: '', cedula: '', phone: '', type: 'visitante' });
     const [filterType, setFilterType] = useState(null);
 
-    const initialData = [
-        {
-            id: 1,
-            name: "Jaime",
-            cedula: "123",
-            phone: "1234",
-            type: false
-        }
+    const datas = [
+        
     ];
+    
+    const mappedData = datas.map(item => ({
+        image : item.image,
+        primary: item.name,
+        secondary: `CC. ${item.cedula}  Phone ${item.phone}`,
+        tertiary: ` ${item.tipo},  ${item.companie}`,
+        additional: `Carnet: ${item.carnet}`
+    }));
 
     useEffect(() => {
-        setData(initialData);
-        setFilteredData(initialData);
+        setData(mappedData);
+        setFilteredData(mappedData);
     }, []);
-
-    useEffect(() => {
-        let filtered = data;
-
-        if (searchTerm) {
-            filtered = filtered.filter(item =>
-                item.name.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-        }
-
-        if (filterType !== null) {
-            filtered = filtered.filter(item =>
-                (filterType === 'empleado' && item.type === true) ||
-                (filterType === 'visitante' && item.type === false)
-            );
-        }
-
-        setFilteredData(filtered);
-    }, [searchTerm, data, filterType]);
-
-    const columns = [
-        { Header: 'ID', accessor: 'id' },
-        { Header: 'Name', accessor: 'name' },
-        { Header: 'Cedula', accessor: 'cedula' },
-        { Header: 'Phone', accessor: 'phone' },
-        {
-            Header: 'Type',
-            accessor: 'type',
-            Cell: ({ value }) => (value ? 'Empleado' : 'Visitante')
-        },
-    ];
 
     const handleSubmit = (newData) => {
         if (isEditing) {
@@ -100,20 +70,17 @@ const CompanyInfo = () => {
             searchValue={searchTerm}
             onSearchChange={(e) => setSearchTerm(e.target.value)}
             onAddNew={handleAddNew}
-            extraButtons={[
-                {
-                    label: 'Empleado',
-                    onClick: () => handleFilterClick('empleado'),
-                    className: filterType === 'empleado' ? 'bg-blue-600' : 'bg-gray-200'
-                },
-                {
-                    label: 'Visitante',
-                    onClick: () => handleFilterClick('visitante'),
-                    className: filterType === 'visitante' ? 'bg-blue-600' : 'bg-gray-200'
-                }
-            ]}
         >
-            <Table columns={columns} data={filteredData} onEdit={handleEdit} onDelete={handleDelete} />
+            <List>
+                {filteredData.map((item, index) => (
+                    <CardItem
+                        key={index}
+                        data={item}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                    />
+                ))}
+            </List>
             <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
                 <Form
                     fields={[
