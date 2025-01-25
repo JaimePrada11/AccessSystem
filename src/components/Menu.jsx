@@ -133,7 +133,8 @@ const Menu = () => {
             <MdCardMembership size={32} />
           </Link>
           <Link to="/equipments" className="flex flex-col items-center">
-            <FaFileInvoiceDollar size={32} />
+            <FaFileInvoiceDollar
+             size={32} />
           </Link>
         </div>
       )}

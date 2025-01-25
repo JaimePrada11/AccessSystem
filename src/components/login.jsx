@@ -4,7 +4,6 @@ import { FaKey } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import {useNavigate } from "react-router";
 
-
 const Login = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [username, setUsername] = useState("");
@@ -14,17 +13,13 @@ const Login = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetch("https://randomuser.me/api/?results=5")
+        fetch("http://localhost:8080/api/users")
             .then((response) => response.json())
             .then((data) => {
-                const users = data.results.map(user => ({
-                    username: user.login.username,
-                    password: user.login.password
-                }));
-                setUsuarios(users);
-                console.log(users);
+                setUsuarios(data); 
+                console.log(data);
             })
-            .catch((error) => console.error("Error fetching random user:", error));
+            .catch((error) => console.error("Error fetching users:", error));
     }, []);
 
     const handleSubmit = (event) => {
@@ -42,8 +37,7 @@ const Login = () => {
 
             if (userf) {
                 setMessage("Access granted");
-                navigate(`/home`); 
-
+                navigate(`/home`);
             } else {
                 setMessage("Invalid username or password");
             }
@@ -67,7 +61,7 @@ const Login = () => {
                     <div className="space-y-5">
                         <div className="relative flex flex-col">
                             <label htmlFor="username" className="mb-2 font-semibold text-gray-200">Username</label>
-                            <CiUser className="absolute text-white  left-3 top-10 text-gray-400" size={24} />
+                            <CiUser className="absolute text-white left-3 top-10 text-gray-400" size={24} />
                             <input
                                 type="text"
                                 name="username"
@@ -87,7 +81,7 @@ const Login = () => {
                                 name="password"
                                 id="password"
                                 placeholder="Enter your password"
-                                className="p-3 pl-12 text-white border-b border-gray-700 bg-transparent  placeholder-white focus:outline-none focus:ring-0"
+                                className="p-3 pl-12 text-white border-b border-gray-700 bg-transparent placeholder-white focus:outline-none focus:ring-0"
                                 value={password}
                                 onChange={handleChange}
                             />
@@ -106,7 +100,7 @@ const Login = () => {
                     <div className="flex flex-row items-center justify-center mt-4 text-gray-200">
                         <p className="mr-2">Don't have an account?</p>
                         <Link to="/signin" className="text-blue-400 font-semibold hover:text-blue-700 transition duration-300 cursor-pointer">
-                        Sign Up
+                            Sign Up
                         </Link>
                     </div>
                 </form>
