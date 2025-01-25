@@ -53,7 +53,7 @@ const Menu = () => {
       </button>
 
       {/* Sidebar */}
-      <div className={`h-screen bg-blue-900/10 text-white flex flex-col fixed left-0 top-0 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:w-20'}`}>
+      <div className={`h-screen bg-blue-900/10 text-white flex flex-col fixed left-0 top-0 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:w-25'}`}>
         <div
           className="absolute inset-0 bg-black/10 backdrop-blur-2xl"
           style={{
@@ -65,44 +65,44 @@ const Menu = () => {
           }}
         ></div>
 
-        <div className="flex items-center justify-center h-16 relative z-10">
-          <SiParrotsecurity className="text-3xl mr-2" />
-          {isOpen && <Link to="/" className="text-2xl font-bold text-white">Entry System</Link>}
+        <div className="flex items-center justify-center p-3 h-32 relative z-10">
+          <SiParrotsecurity className="text-4xl mr-2" />
+          {isOpen && <Link to="/" className="text-2xl  font-bold text-white">Entry System</Link>}
         </div>
 
         <nav className="flex-grow flex flex-col justify-between py-4 relative z-10">
           <ul className="space-y-2 text-white">
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'empresas' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('empresas')}>
-              <FaBuilding className="mr-3" />
+              <FaBuilding className="mr-3 text-2xl" />
               {isOpen && <Link to="/company" className="flex items-center">Companies</Link>}
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'personas' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('personas')}>
-              <IoIosPeople className="mr-3" />
+              <IoIosPeople className="mr-3 text-2xl" />
               {isOpen && <Link to="/people" className="flex items-center">People</Link>}
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'celadores' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('celadores')}>
-              <PiSecurityCamera className="mr-3" />
+              <PiSecurityCamera className="mr-3 text-2xl" />
               {isOpen && <Link to="/celadores" className="flex items-center">Access</Link>}
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'ingresos' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('ingresos')}>
-              <MdOutlineExitToApp className="mr-3" />
+              <MdOutlineExitToApp className="mr-3 text-2xl" />
               {isOpen && <Link to="/ingresos" className="flex items-center">Exit</Link>}
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'vehiculos' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('vehiculos')}>
-              <FaBiking className="mr-3" />
+              <FaBiking className="mr-3 text-2xl" />
               {isOpen && <Link to="/vehicles" className="flex items-center">Vehicles</Link>}
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'equipos' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('equipos')}>
-              <FaLaptop className="mr-3" />
+            <Link to="/equipments" > <FaLaptop className="mr-3 text-2xl" /></Link>
               {isOpen && <Link to="/equipments" className="flex items-center">Equipments</Link>}
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'equipos' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('equipos')}>
-              <MdCardMembership className="mr-3" />
+              <MdCardMembership className="mr-3 text-2xl" />
               {isOpen && <Link to="/memberships" className="flex items-center">Membership</Link>}
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'equipos' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('equipos')}>
-              <FaFileInvoiceDollar className="mr-3" />
-              {isOpen && <Link to="/equipments" className="flex items-center">Invoices</Link>}
+              <FaFileInvoiceDollar className="mr-3 text-2xl" />
+              {isOpen && <Link to="/invoice" className="flex items-center">Invoices</Link>}
             </li>
           </ul>
         </nav>

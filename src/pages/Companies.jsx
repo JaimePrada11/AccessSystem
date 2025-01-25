@@ -14,6 +14,7 @@ const Companies = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({ id: null, name: '' });
+  const [validationError, setValidationError] = useState('');
 
   const initialData = [
     {
@@ -57,7 +58,14 @@ const Companies = () => {
   // POST
   const handleSubmit = (event) => {
     event.preventDefault();
-    const newCompany = { name: editData.name };
+
+    // Validación
+    if (editData.name.trim() === '') {
+      setValidationError('El nombre no puede estar vacío o contener solo espacios en blanco');
+      return;
+    }
+
+    const newCompany = { name: editData.name.trim() };
 
     if (editMode) {
       const updatedData = data.map(company =>
@@ -74,6 +82,7 @@ const Companies = () => {
     setEditData({ id: null, name: '' });
     setEditMode(false);
     setModalOpen(false);
+    setValidationError(''); // Clear the validation error
   };
 
   const handleEdit = (company) => {
@@ -117,10 +126,8 @@ const Companies = () => {
           filteredData.map((item, index) => (
             <div key={index} className="bg-white/10 backdrop-blur-lg p-6 rounded-xl flex flex-col items-center shadow-lg">
              <Link to={`/company/${item.id}`}>
-             <FaBuilding size={50} className="text-gray-800 mt-4" />
+               <FaBuilding size={50} className="text-gray-800 mt-4" />
              </Link>
-              
-              
               <div className="text-center mt-4">
                 <div className="font-bold text-lg text-gray-800 uppercase tracking-wide">
                   {item.name}
@@ -128,10 +135,10 @@ const Companies = () => {
               </div>
               <div className="flex gap-4 mt-4">
                 <button
-                        className="px-3 py-1 rounded-md flex items-center transition-transform duration-300 hover:scale-105"
-                        onClick={() => handleEdit(item)}
+                  className="px-3 py-1 rounded-md flex items-center transition-transform duration-300 hover:scale-105"
+                  onClick={() => handleEdit(item)}
                 >
-                  <FaEdit  className="text-blue-500 text-xl"  /> 
+                  <FaEdit className="text-blue-500 text-xl" /> 
                 </button>
                 <button
                   className="px-3 py-1 rounded-md flex items-center transition-transform duration-300 hover:scale-105"
@@ -161,6 +168,7 @@ const Companies = () => {
               onChange={(e) => setEditData({ ...editData, name: e.target.value })}
               className="w-full p-2 mt-1 border border-gray-300 rounded"
             />
+            {validationError && <p className="text-red-500 mt-1">{validationError}</p>}
           </label>
           <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded mt-4">
             Save

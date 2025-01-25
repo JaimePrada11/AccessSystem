@@ -26,7 +26,7 @@ const MainContainer = () => {
       <div className="flex flex-col lg:flex-row justify-between items-center w-full gap-6">
         <div className="w-full lg:w-2/3">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Acceso Rápido</h1>
-          <div className="grid grid-cols-2 gap-6 w-full">
+          <div className="grid grid-cols-2 gap-6 mb-8 w-full">
             {menuItems.map((item, index) => (
               <div
                 key={index}
@@ -43,10 +43,10 @@ const MainContainer = () => {
           </div>
         </div>
 
-        <div className="w-full lg:w-1/3 hidden items-center sm:block p-6 bg-white/10 backdrop-blur-lg rounded-xl transform transition-transform duration-300 hover:scale-105">
+        <div className="w-full lg:w-1/3 flex hidden items-center sm:block p-6 bg-white/10 backdrop-blur-lg rounded-xl transform transition-transform duration-300 hover:scale-105 items-center justify-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Calendar</h2>
-          <div className="p-4 bg-white rounded-lg ">
-            <Calendar />
+          <div className="p-4 rounded-lg ">
+            <Calendar className="rounded-3xl text-xl bg-transparent " />
           </div>
         </div>
       </div>

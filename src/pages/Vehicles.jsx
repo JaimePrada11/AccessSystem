@@ -222,7 +222,7 @@ export default function Vehicle() {
             <div className="mx-auto flex flex-col items-center rounded-lg w-full">
                 <div className="w-[90%]">
                     <img
-                        src="https://images.pexels.com/photos/409701/pexels-photo-409701.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                        src="https://images.pexels.com/photos/1756957/pexels-photo-1756957.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                         className="shadow-xl w-full h-64 object-cover rounded-md"
                         alt="Edificio"
                     />

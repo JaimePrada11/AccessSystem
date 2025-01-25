@@ -34,7 +34,6 @@ const Memberships = () => {
 
   const mappedData = initialData.map(item => ({
     image: item.image,
-    primary: "Membresia",
     secondary: `Duracion: ${item.Duracion} dias`,
     tertiary: `precio: ${item.precio}`,
     additional: `vehiclos: ${item.vehicletype}`

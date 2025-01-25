@@ -10,6 +10,8 @@ import People from './pages/People';
 import Vehicle from './pages/Vehicles';
 import Equipments from './pages/Equipments';
 import Memberships from './pages/Memberships';
+import Invoice from './pages/Invoice';
+import PersonInfo from './pages/PersonInfo';
 
 function App() {
   return (
@@ -21,10 +23,12 @@ function App() {
           <Route path="/" element={<MainContainer />} />
           <Route path="/company" element={<Companies />} />
           <Route path="/people" element={<People />} />
+          <Route path="/people/:id" element={<PersonInfo />} />
           <Route path="/company/:id" element={<CompanyInfo />} />
           <Route path="/vehicles" element={<Vehicle />} />
           <Route path="/equipments" element={<Equipments />} />
           <Route path="/memberships" element={<Memberships />} />
+          <Route path="/invoice" element={<Invoice />} />
         </Route>
       </Routes>
     </Router>

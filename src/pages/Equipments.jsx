@@ -6,6 +6,7 @@ import Form from '../components/Form';
 import CommonLayout from '../CommonLayout';
 import List from '../components/Cards/List';
 import CardItem from '../components/Cards/CardItem';
+
 const Equipments = () => {
     const [data, setData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -95,7 +96,7 @@ const Equipments = () => {
 
     return (
         <CommonLayout
-            titleImage="https://images.pexels.com/photos/290595/pexels-photo-290595.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            titleImage="https://images.pexels.com/photos/2225617/pexels-photo-2225617.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
             searchPlaceholder="Search by Serial"
             searchValue={searchTerm}
             onSearchChange={(e) => setSearchTerm(e.target.value)}
