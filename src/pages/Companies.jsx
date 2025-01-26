@@ -16,32 +16,23 @@ const Companies = () => {
   const [editData, setEditData] = useState({ id: null, name: '' });
   const [validationError, setValidationError] = useState('');
 
-  const initialData = [
-    {
-      id: 1,
-      name: "prueba"
-    }
-  ];
-
-  //  GET 
   const fetchCompanies = () => {
-    /*
-    fetch('http://localhost:8080/api/companies')
-      .then(response => response.json())
+    fetch('http://localhost:8083/api/company') 
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
       .then(data => {
         setData(data);
         setFilteredData(data);
         setLoading(false);
       })
       .catch(error => {
-        setError('Error fetching data');
+        setError('Error fetching data: ' + error.message);
         setLoading(false);
       });
-    */
-
-    setData(initialData);
-    setFilteredData(initialData);
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -59,7 +50,6 @@ const Companies = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    // Validación
     if (editData.name.trim() === '') {
       setValidationError('El nombre no puede estar vacío o contener solo espacios en blanco');
       return;
@@ -69,17 +59,17 @@ const Companies = () => {
 
     if (editMode) {
       const updatedData = data.map(company =>
-        company.id === editData.id ? { ...company, name: newCompany.name } : company
+        company.id_company === editData.id_company ? { ...company, name: newCompany.name } : company
       );
       setData(updatedData);
       setFilteredData(updatedData);
     } else {
-      const updatedData = [...data, { id: data.length + 1, name: newCompany.name }];
+      const updatedData = [...data, { id_company: data.length + 1, name: newCompany.name }];
       setData(updatedData);
       setFilteredData(updatedData);
     }
 
-    setEditData({ id: null, name: '' });
+    setEditData({ id_company: null, name: '' });
     setEditMode(false);
     setModalOpen(false);
     setValidationError(''); // Clear the validation error
@@ -92,13 +82,13 @@ const Companies = () => {
   };
 
   const handleDelete = (id) => {
-    const updatedData = data.filter(company => company.id !== id);
+    const updatedData = data.filter(company => company.id_company !== id);
     setData(updatedData);
     setFilteredData(updatedData);
   };
 
   const handleAddNew = () => {
-    setEditData({ id: null, name: '' });
+    setEditData({ id_company: null, name: '' });
     setEditMode(false);
     setModalOpen(true);
   };
@@ -125,9 +115,9 @@ const Companies = () => {
         ) : filteredData.length > 0 ? (
           filteredData.map((item, index) => (
             <div key={index} className="bg-white/10 backdrop-blur-lg p-6 rounded-xl flex flex-col items-center shadow-lg">
-             <Link to={`/company/${item.id}`}>
-               <FaBuilding size={50} className="text-gray-800 mt-4" />
-             </Link>
+              <Link to={`/company/${item.id_company}`}>
+                <FaBuilding size={50} className="text-gray-800 mt-4" />
+              </Link>
               <div className="text-center mt-4">
                 <div className="font-bold text-lg text-gray-800 uppercase tracking-wide">
                   {item.name}
@@ -142,7 +132,7 @@ const Companies = () => {
                 </button>
                 <button
                   className="px-3 py-1 rounded-md flex items-center transition-transform duration-300 hover:scale-105"
-                  onClick={() => handleDelete(item.id)}
+                  onClick={() => handleDelete(item.id_company)}
                 >
                   <MdDelete className="text-red-500 text-xl" /> 
                 </button>

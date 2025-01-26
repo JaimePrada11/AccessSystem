@@ -1,26 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { CiUser } from "react-icons/ci";
 import { FaKey } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import {useNavigate } from "react-router";
+import { useNavigate } from "react-router";
+import useApi from "../../hooks/useApi";
 
 const Login = () => {
-    const [usuarios, setUsuarios] = useState([]);
+    const { data: usuarios, loading, error } = useApi("/user");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState({});
     const [message, setMessage] = useState("");
     const navigate = useNavigate();
-
-    useEffect(() => {
-        fetch("http://localhost:8080/api/users")
-            .then((response) => response.json())
-            .then((data) => {
-                setUsuarios(data); 
-                console.log(data);
-            })
-            .catch((error) => console.error("Error fetching users:", error));
-    }, []);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -30,14 +21,12 @@ const Login = () => {
         setErrors(formErrors);
 
         if (Object.keys(formErrors).length === 0) {
-            const userf = usuarios.find((usuario) =>
-                usuario.username === username &&
-                usuario.password === password
+            const userf = usuarios.find(
+                (usuario) => usuario.userName === username && usuario.password === password
             );
 
             if (userf) {
-                setMessage("Access granted");
-                navigate(`/home`);
+                navigate(`/`);
             } else {
                 setMessage("Invalid username or password");
             }
@@ -55,13 +44,13 @@ const Login = () => {
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-900 to-red-100">
-            <section className="bg-white/10 backdrop-blur-md bg-opacity-20 p-8  rounded-lg shadow-lg w-full max-w-md">
-                <form className="space-y-6 " onSubmit={handleSubmit}>
+            <section className="bg-white/10 backdrop-blur-md bg-opacity-20 p-8 rounded-lg shadow-lg w-full max-w-md">
+                <form className="space-y-6" onSubmit={handleSubmit}>
                     <h2 className="text-3xl font-bold text-center text-gray-800 uppercase">Sign In</h2>
                     <div className="space-y-5">
                         <div className="relative flex flex-col">
                             <label htmlFor="username" className="mb-2 font-semibold text-gray-200">Username</label>
-                            <CiUser className="absolute text-white left-3 top-10 text-gray-400" size={24} />
+                            <CiUser className="absolute left-3 top-10 text-gray-400" size={24} />
                             <input
                                 type="text"
                                 name="username"
@@ -75,7 +64,7 @@ const Login = () => {
                         </div>
                         <div className="relative flex flex-col">
                             <label htmlFor="password" className="mb-2 font-semibold text-gray-200">Password</label>
-                            <FaKey className="absolute text-white left-3 top-10 text-gray-400" size={24} />
+                            <FaKey className="absolute left-3 top-10 text-gray-400" size={24} />
                             <input
                                 type="password"
                                 name="password"
@@ -107,6 +96,6 @@ const Login = () => {
             </section>
         </div>
     );
-}
+};
 
 export default Login;
