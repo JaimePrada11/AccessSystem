@@ -4,50 +4,30 @@ import { MdOutlineAddCircleOutline, MdDelete } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import Modal from '../components/Modal';
 import CommonLayout from '../CommonLayout';
+import useApi from '../hooks/useApi';
 
 const Companies = () => {
-  const [data, setData] = useState([]);
+  const { data, loading, error, createItem, updateItem, removeItem, fetchData } = useApi('/company');
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [editData, setEditData] = useState({ id: null, name: '' });
+  const [editData, setEditData] = useState({ id_company: null, name: '' });
   const [validationError, setValidationError] = useState('');
 
-  const fetchCompanies = () => {
-    fetch('http://localhost:8083/api/company') 
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        setData(data);
-        setFilteredData(data);
-        setLoading(false);
-      })
-      .catch(error => {
-        setError('Error fetching data: ' + error.message);
-        setLoading(false);
-      });
-  };
-
   useEffect(() => {
-    fetchCompanies();
-  }, []);
-
-  useEffect(() => {
-    const filtered = data.filter(company =>
-      company.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredData(filtered);
+    if (Array.isArray(data)) {
+      const filtered = data.filter(company =>
+        company.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredData(filtered);
+    } else {
+      setFilteredData([]);
+    }
   }, [searchTerm, data]);
 
-  // POST
-  const handleSubmit = (event) => {
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (editData.name.trim() === '') {
@@ -58,21 +38,15 @@ const Companies = () => {
     const newCompany = { name: editData.name.trim() };
 
     if (editMode) {
-      const updatedData = data.map(company =>
-        company.id_company === editData.id_company ? { ...company, name: newCompany.name } : company
-      );
-      setData(updatedData);
-      setFilteredData(updatedData);
+      await updateItem(editData.id_company, newCompany);
     } else {
-      const updatedData = [...data, { id_company: data.length + 1, name: newCompany.name }];
-      setData(updatedData);
-      setFilteredData(updatedData);
+      await createItem(newCompany);
     }
 
     setEditData({ id_company: null, name: '' });
     setEditMode(false);
     setModalOpen(false);
-    setValidationError(''); // Clear the validation error
+    setValidationError('');
   };
 
   const handleEdit = (company) => {
@@ -81,10 +55,8 @@ const Companies = () => {
     setModalOpen(true);
   };
 
-  const handleDelete = (id) => {
-    const updatedData = data.filter(company => company.id_company !== id);
-    setData(updatedData);
-    setFilteredData(updatedData);
+  const handleDelete = async (id) => {
+    await removeItem(id);
   };
 
   const handleAddNew = () => {
@@ -112,9 +84,9 @@ const Companies = () => {
           <div className="flex justify-center items-center w-full">
             <p>{error}</p>
           </div>
-        ) : filteredData.length > 0 ? (
-          filteredData.map((item, index) => (
-            <div key={index} className="bg-white/10 backdrop-blur-lg p-6 rounded-xl flex flex-col items-center shadow-lg">
+        ) : Array.isArray(filteredData) && filteredData.length > 0 ? (
+          filteredData.map((item) => (
+            <div key={item.id_company} className="bg-white/10 backdrop-blur-lg p-6 rounded-xl flex flex-col items-center shadow-lg">
               <Link to={`/company/${item.id_company}`}>
                 <FaBuilding size={50} className="text-gray-800 mt-4" />
               </Link>
@@ -125,13 +97,13 @@ const Companies = () => {
               </div>
               <div className="flex gap-4 mt-4">
                 <button
-                  className="px-3 py-1 rounded-md flex items-center transition-transform duration-300 hover:scale-105"
+                  className="px-3 cursor-pointer py-1 rounded-md flex items-center transition-transform duration-300 hover:scale-105"
                   onClick={() => handleEdit(item)}
                 >
                   <FaEdit className="text-blue-500 text-xl" /> 
                 </button>
                 <button
-                  className="px-3 py-1 rounded-md flex items-center transition-transform duration-300 hover:scale-105"
+                  className="px-3 cursor-pointer py-1 rounded-md flex items-center transition-transform duration-300 hover:scale-105"
                   onClick={() => handleDelete(item.id_company)}
                 >
                   <MdDelete className="text-red-500 text-xl" /> 
@@ -160,7 +132,7 @@ const Companies = () => {
             />
             {validationError && <p className="text-red-500 mt-1">{validationError}</p>}
           </label>
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded mt-4">
+          <button type="submit" className="bg-blue-600 cursor-pointer text-white px-4 py-2 rounded mt-4">
             Save
           </button>
         </form>

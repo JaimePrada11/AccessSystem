@@ -1,76 +1,60 @@
 import React, { useState, useEffect } from 'react';
-import { CiSearch } from "react-icons/ci";
-import { IoMdAddCircle } from "react-icons/io";
 import Modal from '../components/Modal';
 import Form from '../components/Form';
 import CommonLayout from '../CommonLayout';
 import List from '../components/Cards/List';
 import CardItem from '../components/Cards/CardItem';
+import useApi from '../hooks/useApi';
 
 const Equipments = () => {
-    const [data, setData] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
+    const { data, loading, error, createItem, updateItem, removeItem } = useApi('/people'); // URL de la API para obtener personas
     const [filteredData, setFilteredData] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({ serial: '', registrationDate: '', description: '', owner: '' });
+    const [searchTerm, setSearchTerm] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
 
-    const initialData = [
-        {
-            id: 1,
-            serial: "123456",
-            registrationDate: "2023-01-01",
-            description: "Example equipment",
-            owner: "John Doe"
-        },
-        {
-            id: 2,
-            serial: "789012",
-            registrationDate: "2023-05-10",
-            description: "Another equipment",
-            owner: "Jane Doe"
-        }
-    ];
-
-    const mappedData = initialData.map(item => ({
-        image: item.image,
-        primary: item.serial,
-        secondary: `Fecha de Registro: ${item.registrationDate}`,
-        tertiary: `Descripción: ${item.description}`,
-        additional: `Dueño: ${item.owner}`
-    }));
+    // Mapeo de los datos de personas a la estructura esperada para los equipos
+    const mappedData = (data || []).flatMap(person => 
+        person.equipments.map(item => ({
+            id: item.id,
+            image: item.image, // Si tienes alguna imagen, sino puedes quitar esta propiedad
+            primary: item.serial,
+            secondary: `Fecha de Registro: ${item.registrationDate}`,
+            tertiary: `Descripción: ${item.description}`,
+            additional: `Dueño: ${person.name}`
+        }))
+    );
 
     useEffect(() => {
-        setData(initialData);
-        setFilteredData(initialData);
-    }, []);
+        setFilteredData(mappedData);
+    }, [data]);
 
     useEffect(() => {
-        let filtered = data.filter(item =>
-            item.serial.toLowerCase().includes(searchTerm.toLowerCase())
+        let filtered = mappedData.filter(item =>
+            item.primary.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
         if (startDate && endDate) {
             filtered = filtered.filter(item =>
-                item.registrationDate >= startDate && item.registrationDate <= endDate
+                item.secondary >= startDate && item.secondary <= endDate
             );
         } else if (startDate) {
-            filtered = filtered.filter(item => item.registrationDate >= startDate);
+            filtered = filtered.filter(item => item.secondary >= startDate);
         } else if (endDate) {
-            filtered = filtered.filter(item => item.registrationDate <= endDate);
+            filtered = filtered.filter(item => item.secondary <= endDate);
         }
 
         setFilteredData(filtered);
-    }, [searchTerm, startDate, endDate, data]);
+    }, [searchTerm, startDate, endDate]);
 
-
-    const handleSubmit = (newData) => {
+    const handleSubmit = async (newData) => {
         if (isEditing) {
-            setData(data.map(item => (item.id === newData.id ? newData : item)));
+            await updateItem(editData.id, newData); // Actualizar equipo
         } else {
-            setData([...data, { ...newData, id: data.length + 1 }]);
+            await createItem(newData); // Crear nuevo equipo
         }
         setModalOpen(false);
         setEditData({ serial: '', registrationDate: '', description: '', owner: '' });
@@ -82,10 +66,8 @@ const Equipments = () => {
         setModalOpen(true);
     };
 
-    const handleDelete = (item) => {
-        const updatedData = data.filter(dataItem => dataItem.id !== item.id);
-        setData(updatedData);
-        setFilteredData(updatedData);
+    const handleDelete = async (item) => {
+        await removeItem(item.id); // Eliminar equipo
     };
 
     const handleAddNew = () => {
@@ -102,17 +84,22 @@ const Equipments = () => {
             onSearchChange={(e) => setSearchTerm(e.target.value)}
             onAddNew={handleAddNew} >
 
-            <List>
-                {mappedData.map((item, index) => (
-                    <CardItem
-                        key={index}
-                        data={item}
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                    />
-
-                ))}
-            </List>
+            {loading ? (
+                <p>Cargando datos...</p>
+            ) : error ? (
+                <p>{error}</p>
+            ) : (
+                <List>
+                    {filteredData.map((item, index) => (
+                        <CardItem
+                            key={index}
+                            data={item}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                        />
+                    ))}
+                </List>
+            )}
 
             <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
                 <Form

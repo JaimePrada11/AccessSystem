@@ -28,7 +28,7 @@ const CommonLayout = ({ titleImage, searchPlaceholder, searchValue, onSearchChan
                     
                     <button 
                         onClick={onAddNew}
-                        className="w-32 h-10 bg-blue-600 text-white px-4 rounded-md flex items-center justify-center gap-2 hover:bg-blue-700 transition-transform transform hover:scale-105">
+                        className="w-32 cursor-pointer h-10 bg-blue-600 text-white px-4 rounded-md flex items-center justify-center gap-2 hover:bg-blue-700 transition-transform transform hover:scale-105">
                         <IoMdAddCircle className="text-xl" /> Add New
                     </button>
                 </div>

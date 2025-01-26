@@ -12,19 +12,21 @@ import Equipments from './pages/Equipments';
 import Memberships from './pages/Memberships';
 import Invoice from './pages/Invoice';
 import PersonInfo from './pages/PersonInfo';
+import Access from './pages/Access';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
         <Route path="/signin" element={<SignIn />} />
         <Route element={<Layout />}>
-          <Route path="/" element={<MainContainer />} />
+          <Route path="/home" element={<MainContainer />} />
           <Route path="/company" element={<Companies />} />
           <Route path="/people" element={<People />} />
           <Route path="/people/:id" element={<PersonInfo />} />
           <Route path="/company/:id" element={<CompanyInfo />} />
+          <Route path="/access/" element={<Access />} />         
           <Route path="/vehicles" element={<Vehicle />} />
           <Route path="/equipments" element={<Equipments />} />
           <Route path="/memberships" element={<Memberships />} />

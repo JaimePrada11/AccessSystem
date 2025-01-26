@@ -1,84 +1,77 @@
 import React, { useState, useEffect } from 'react';
-import { FaBuilding, FaEdit } from "react-icons/fa";
-import { MdOutlineAddCircleOutline, MdDelete } from "react-icons/md";
-import { Link } from 'react-router-dom';
 import Modal from '../components/Modal';
 import CommonLayout from '../CommonLayout';
-import List from '../components/Cards/List'; // Asegúrate de importar List
-import CardItem from '../components/Cards/CardItem'; // Asegúrate de importar CardItem
+import List from '../components/Cards/List';
+import CardItem from '../components/Cards/CardItem';
+import useApi from '../hooks/useApi';
 
 const Memberships = () => {
-  const [data, setData] = useState([]);
+  const { data, loading, error, createItem, updateItem, removeItem } = useApi('/membership'); 
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({ id: null, Duracion: '', precio: '', vehicletype: '' });
 
-  const initialData = [
-    {
-        id: 1,
-        Duracion: 30,
-        precio: 12.56,
-        vehicletype: "Car"
-    },
-    {
-        id: 2,
-        Duracion: 30,
-        precio: 12.56,
-        vehicletype: "Car"
+  useEffect(() => {
+    if (data && Array.isArray(data)) {
+      setFilteredData(data); 
     }
-  ];
-
-  const mappedData = initialData.map(item => ({
-    image: item.image,
-    secondary: `Duracion: ${item.Duracion} dias`,
-    tertiary: `precio: ${item.precio}`,
-    additional: `vehiclos: ${item.vehicletype}`
-  }));
+  }, [data]);
 
   useEffect(() => {
-    setData(initialData);
-    setFilteredData(initialData);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    let filtered = data.filter(item =>
-      item.id.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredData(filtered);
+    if (data && Array.isArray(data)) {
+      const filtered = data.filter(item =>
+        item.idMembership && item.idMembership.toString().toLowerCase().includes(searchTerm.toLowerCase()) 
+      );
+      setFilteredData(filtered); 
+    }
   }, [searchTerm, data]);
 
-  const handleSubmit = (newData) => {
-    if (isEditing) {
-      setData(data.map(item => (item.id === newData.id ? newData : item)));
-    } else {
-      setData([...data, { ...newData, id: data.length + 1 }]);
+  const mappedData = filteredData.map(item => ({
+    image: item.image || 'default_image_url',  
+    secondary: `Duracion: ${item.duration} días`, 
+    tertiary: `Precio: ${item.price}`, 
+    additional: `Vehículos: ${item.vehicleType ? 'Carro' : 'Moto'}`,  
+  }));
+
+  const handleSubmit = async (newData) => {
+    try {
+      if (isEditing) {
+        await updateItem(newData.id, newData); 
+      } else {
+        await createItem(newData);  
+      }
+      setModalOpen(false);
+      setEditData({ id: null, Duracion: '', precio: '', vehicletype: '' });
+    } catch (err) {
+      console.error('Error al guardar datos:', err);
     }
-    setModalOpen(false);
-    setEditData({ id: null, Duracion: '', precio: '', vehicletype: '' });
   };
 
   const handleEdit = (item) => {
-    setEditData(item);
+    setEditData(item); 
     setIsEditing(true);
     setModalOpen(true);
   };
 
-  const handleDelete = (item) => {
-    const updatedData = data.filter(dataItem => dataItem.id !== item.id);
-    setData(updatedData);
-    setFilteredData(updatedData);
+  const handleDelete = async (item) => {
+    try {
+      await removeItem(item.id); 
+      setFilteredData(filteredData.filter(dataItem => dataItem.id !== item.id));
+    } catch (err) {
+      console.error('Error al eliminar el item:', err);
+    }
   };
 
   const handleAddNew = () => {
-    setEditData({ id: null, Duracion: '', precio: '', vehicletype: '' });
-    setIsEditing(false);
-    setModalOpen(true);
+    setEditData({ id: null, Duracion: '', precio: '', vehicletype: '' });  
+    setIsEditing(false); 
+    setModalOpen(true); 
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{`Error: ${error.message || 'Error al cargar los datos'}`}</p>;
 
   return (
     <CommonLayout

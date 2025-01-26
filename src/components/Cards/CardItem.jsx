@@ -4,7 +4,7 @@ import { MdDelete } from "react-icons/md";
 
 const CardItem = ({ data, onEdit, onDelete }) => {
     return (
-        <article className="md:w-[45%] lg:w-[45%] flex items-start space-x-6 p-6 bg-white shadow rounded border border-gray-200">
+        <article className="w-full flex items-start space-x-6 p-6 bg-white shadow rounded border border-gray-200">
             <div className="flex flex-col items-center justify-center">
                 <img src={data.image} alt="" width="60" height="88" className="rounded-md bg-slate-100" />
                 <div className="flex items-center space-x-2 mt-2">

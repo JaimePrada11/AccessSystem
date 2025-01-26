@@ -29,7 +29,6 @@ const SignIn = () => {
     setErrors(formErrors);
 
     if (Object.keys(formErrors).length === 0) {
-      // Form submit logic here
       console.log("Form submitted successfully!");
     }
   };

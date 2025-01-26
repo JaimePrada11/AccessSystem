@@ -82,11 +82,11 @@ const Menu = () => {
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'celadores' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('celadores')}>
               <PiSecurityCamera className="mr-3 text-2xl" />
-              {isOpen && <Link to="/celadores" className="flex items-center">Access</Link>}
+              {isOpen && <Link to="/access" className="flex items-center">Access</Link>}
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'ingresos' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('ingresos')}>
               <MdOutlineExitToApp className="mr-3 text-2xl" />
-              {isOpen && <Link to="/ingresos" className="flex items-center">Exit</Link>}
+              {isOpen && <Link to="/" className="flex items-center">Exit</Link>}
             </li>
             <li className={`px-4 py-2 hover:bg-gray-700/50 transition-all duration-300 rounded-md flex items-center ${activeItem === 'vehiculos' ? 'bg-gray-700/50' : ''}`} onClick={() => handleItemClick('vehiculos')}>
               <FaBiking className="mr-3 text-2xl" />
@@ -117,10 +117,10 @@ const Menu = () => {
           <Link to="/people" className="flex flex-col items-center">
             <IoIosPeople size={32} />
           </Link>
-          <Link to="/celadores" className="flex flex-col items-center">
+          <Link to="/access" className="flex flex-col items-center">
             <PiSecurityCamera size={32} />
           </Link>
-          <Link to="/ingresos" className="flex flex-col items-center">
+          <Link to="/" className="flex flex-col items-center">
             <MdOutlineExitToApp size={32} />
           </Link>
           <Link to="/vehicles" className="flex flex-col items-center">

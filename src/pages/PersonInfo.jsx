@@ -1,42 +1,108 @@
-
 import React from 'react';
-import { useUserInfo, useUserEquipments, useUserVehicles, useUserInvoices, useUserAccess } from '../hooks/useUserData';
+import CommonLayout from '../CommonLayout';
+import List from '../components/Cards/List';
+import CardItem from '../components/Cards/CardItem';
+import useApi from '../hooks/useApi';
+import { useParams } from 'react-router-dom';
 
-const UserInfo = ({ userId }) => {
-    const { userInfo, loading: userLoading, error: userError } = useUserInfo(userId);
-    const { equipments, loading: equipmentsLoading, error: equipmentsError } = useUserEquipments(userId);
-    const { vehicles, loading: vehiclesLoading, error: vehiclesError } = useUserVehicles(userId);
-    const { invoices, loading: invoicesLoading, error: invoicesError } = useUserInvoices(userId);
-    const { access, loading: accessLoading, error: accessError } = useUserAccess(userId);
+const UserInfo = () => {
+    const { id } = useParams();
+    const { data, loading, error } = useApi(`/people/${id}`);
 
-    if (userLoading || equipmentsLoading || vehiclesLoading || invoicesLoading || accessLoading) {
-        return <p>Loading...</p>;
-    }
+    const mapEquipmentsData = (person) =>
+        person.equipments.map((item) => ({
+            id: item.id,
+            image: item.image || 'https://via.placeholder.com/60x88',
+            primary: item.serial,
+            secondary: `Fecha de Registro: ${item.registrationDate}`,
+            tertiary: `Descripción: ${item.description}`
+        }));
 
-    if (userError || equipmentsError || vehiclesError || invoicesError || accessError) {
-        return <p>Error loading data</p>;
-    }
+    const mapVehiclesData = (person) =>
+        person.vehicles.map((item) => ({
+            id: item.idVehicle,
+            image: item.image || 'https://via.placeholder.com/60x88',
+            primary: item.plate,
+            secondary: `Tipo: ${item.vehicleType ? 'Moto' : 'Carro'}`
+        }));
+
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>{`Error: ${error.message || 'Error al cargar los datos'}`}</p>;
+    if (!data || !data.name) return <p>No user data available</p>;
+
+    const { name, cedula, telefono, personType, equipments, vehicles, invoices } = data;
+    const mappedEquipmentsData = mapEquipmentsData(data);
+    const mappedVehiclesData = mapVehiclesData(data);
+
+    const handleEdit = (id) => {
+        console.log(`Edit user or item with ID: ${id}`);
+    };
+
+    const handleDelete = (id) => {
+        console.log(`Delete user or item with ID: ${id}`);
+    };
 
     return (
-        <div>
-            <h1>User Info</h1>
-            {userInfo && (
-                <div>
-                    <h2>{userInfo.name}</h2>
-                    <p>Email: {userInfo.email}</p>
+        <>
+            <div className="p-6">
+                <div className="flex flex-col items-center justify-center mb-8">
+                    <h1 className="text-3xl font-semibold mb-4">{name}</h1>
+                    <p className="text-lg">Cedula: {cedula}</p>
+                    <p className="text-lg">Telefono: {telefono}</p>
+                    <p className="text-lg">Tipo: {personType ? 'Empleado' : 'Visitante'}</p>
                 </div>
-            )}
-
-            <h2>Equipments</h2>
-            <ul>
-                {equipments.map(equipment => (
-                    <li key={equipment.id}>{equipment.description}</li>
-                ))}
-            </ul>
-
-            <h2>Vehicles</h2>
-
-        </div>
+                <div className="flex flex-wrap justify-center">
+                    <div className="w-full px-2 flex flex-col md:flex-row">
+                        <div className="w-full md:w-1/2 px-2">
+                            <h2 className="text-2xl font-semibold mb-4 text-center">Equipments</h2>
+                            {equipments?.length > 0 ? (
+                                <List>
+                                    {mappedEquipmentsData.map((item) => (
+                                        <CardItem
+                                            key={item.id}
+                                            data={item}
+                                            onEdit={() => handleEdit(item.id)}
+                                            onDelete={() => handleDelete(item.id)}
+                                        />
+                                    ))}
+                                </List>
+                            ) : (
+                                <p>No equipment available</p>
+                            )}
+                        </div>
+                        <div className="w-full md:w-1/2 px-2">
+                            <h2 className="text-2xl font-semibold mb-4 text-center">Vehicles</h2>
+                            {vehicles?.length > 0 ? (
+                                <List>
+                                    {mappedVehiclesData.map((item) => (
+                                        <CardItem
+                                            key={item.id}
+                                            data={item}
+                                            onEdit={() => handleEdit(item.id)}
+                                            onDelete={() => handleDelete(item.id)}
+                                        />
+                                    ))}
+                                </List>
+                            ) : (
+                                <p>No vehicles available</p>
+                            )}
+                        </div>
+                    </div>
+                    <div className="w-full px-2">
+                        <h2 className="text-2xl font-semibold mb-4 text-center">Invoices</h2>
+                        {invoices?.length > 0 ? (
+                            <ul>
+                                {invoices.map((invoice, index) => (
+                                    <li key={index}>Invoice #{index + 1}</li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No invoices available</p>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </>
     );
 };
 

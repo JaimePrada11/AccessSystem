@@ -26,7 +26,7 @@ const Login = () => {
             );
 
             if (userf) {
-                navigate(`/`);
+                navigate(`/main`);
             } else {
                 setMessage("Invalid username or password");
             }
