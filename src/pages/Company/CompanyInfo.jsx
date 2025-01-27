@@ -96,7 +96,6 @@ const CompanyInfo = () => {
         })
         .then((response) => {
           console.log("Datos actualizados con éxito:", response.data);
-          // Refrescar los datos después de actualizar
           fetchAndUpdateData();
         })
         .catch(error => console.error("Error al actualizar la persona:", error));
@@ -112,7 +111,6 @@ const CompanyInfo = () => {
         })
         .then((response) => {
           console.log("Datos creados con éxito:", response.data);
-          // Refrescar los datos después de crear
           fetchAndUpdateData();
         })
         .catch(error => console.error("Error al crear la persona:", error));
@@ -126,7 +124,6 @@ const CompanyInfo = () => {
     }
   };
 
-  // Función para obtener los datos actualizados
   const fetchAndUpdateData = async () => {
     try {
       const response = await axiosInstance.get(`/company/${id}`);
@@ -167,7 +164,6 @@ const CompanyInfo = () => {
       await axiosInstance.delete(`/people/${id}`)
         .then((response) => {
           console.log("Datos eliminados con éxito:", response.data);
-          // Refrescar los datos después de eliminar
           fetchAndUpdateData();
         });
     } catch (error) {

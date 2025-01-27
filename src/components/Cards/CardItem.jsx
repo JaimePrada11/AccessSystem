@@ -4,15 +4,15 @@ import { MdDelete } from "react-icons/md";
 import { Link } from 'react-router-dom';
 
 
-const CardItem = ({ data, onEdit, onDelete, path }) => {
+const CardItem = ({ data, onEdit, onDelete, path, hidden }) => {
     return (
         <article className="md:w-[45%] lg:w-[45%]  flex items-start space-x-6 p-6 bg-white shadow rounded border border-gray-200">
             <div className="flex flex-col items-center justify-center">
                 <Link to={path}>
-                    <img src={data.image} alt="" width="60" height="88" className="rounded-md bg-slate-100" />
+                    <img src={data.image} alt="" className=" w-32 rounded-md bg-slate-100" />
 
                 </Link>
-                <div className="flex items-center space-x-2 mt-2">
+                <div hidden={hidden} className="flex items-center space-x-2 mt-2">
                     <button
                         onClick={() => onEdit(data)} 
                         className="px-3 py-1 rounded-md flex items-center transition-transform duration-300 hover:scale-105"

@@ -4,70 +4,72 @@ import CommonLayout from '../../components/CommonLayout';
 import List from '../../components/Cards/List';
 import CardItem from '../../components/Cards/CardItem';
 import useApi from '../../hooks/useData';
+import axiosInstance from '../../Services/apiService';
+import Form from '../../components/Form';
 
 const Memberships = () => {
-  const { data, loading, error, createItem, updateItem, removeItem } = useApi('/membership'); 
+  const { data, loading, error } = useApi('/membership');
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({ id: null, Duracion: '', precio: '', vehicletype: '' });
 
   useEffect(() => {
     if (data && Array.isArray(data)) {
-      setFilteredData(data); 
+      setFilteredData(data);
     }
   }, [data]);
 
   useEffect(() => {
     if (data && Array.isArray(data)) {
       const filtered = data.filter(item =>
-        item.idMembership && item.idMembership.toString().toLowerCase().includes(searchTerm.toLowerCase()) 
+        (item.duration && item.duration.toString().includes(searchTerm.toLowerCase())) ||
+        (item.price && item.price.toString().includes(searchTerm.toLowerCase()))
       );
-      setFilteredData(filtered); 
+      setFilteredData(filtered);
     }
   }, [searchTerm, data]);
 
   const mappedData = filteredData.map(item => ({
-    image: item.image || 'default_image_url',  
-    secondary: `Duracion: ${item.duration} días`, 
-    tertiary: `Precio: ${item.price}`, 
-    additional: `Vehículos: ${item.vehicleType ? 'Carro' : 'Moto'}`,  
+    image: 'https://images.pexels.com/photos/47344/dollar-currency-money-us-dollar-47344.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+    secondary: `Duración: ${item.duration} días`,
+    tertiary: `Precio: ${item.price}, Vehículos: ${item.vehicleType ? 'Carro' : 'Moto'}`,
   }));
 
-  const handleSubmit = async (newData) => {
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const { Duracion, precio, vehicletype } = editData;
     try {
-      if (isEditing) {
-        await updateItem(newData.id, newData); 
-      } else {
-        await createItem(newData);  
-      }
-      setModalOpen(false);
-      setEditData({ id: null, Duracion: '', precio: '', vehicletype: '' });
+      await axiosInstance.post('/membership', { 
+        duration: Duracion, 
+        price: precio, 
+        vehicleType: vehicletype === 'Carro' 
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then(response => {
+        console.log("Membresía creada con éxito:", response.data);
+        setFilteredData(prevData => [response.data, ...prevData]);
+      })
+      .catch(error => console.error("Error al crear la membresía:", error));
     } catch (err) {
       console.error('Error al guardar datos:', err);
     }
   };
 
-  const handleEdit = (item) => {
-    setEditData(item); 
-    setIsEditing(true);
+  const handleAddNew = () => {
+    setEditData({ id: null, Duracion: '', precio: '', vehicletype: '' });
     setModalOpen(true);
   };
 
-  const handleDelete = async (item) => {
-    try {
-      await removeItem(item.id); 
-      setFilteredData(filteredData.filter(dataItem => dataItem.id !== item.id));
-    } catch (err) {
-      console.error('Error al eliminar el item:', err);
-    }
-  };
-
-  const handleAddNew = () => {
-    setEditData({ id: null, Duracion: '', precio: '', vehicletype: '' });  
-    setIsEditing(false); 
-    setModalOpen(true); 
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setEditData(prevData => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   if (loading) return <p>Loading...</p>;
@@ -76,7 +78,7 @@ const Memberships = () => {
   return (
     <CommonLayout
       titleImage="https://images.pexels.com/photos/290595/pexels-photo-290595.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-      searchPlaceholder="Search by ID"
+      searchPlaceholder="Search by ID or price"
       searchValue={searchTerm}
       onSearchChange={(e) => setSearchTerm(e.target.value)}
       onAddNew={handleAddNew}
@@ -86,42 +88,25 @@ const Memberships = () => {
           <CardItem
             key={index}
             data={item}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
+            hidden={true}
           />
         ))}
       </List>
 
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
-        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(editData); }}>
-          <div>
-            <label>Duracion:</label>
-            <input
-              type="text"
-              value={editData.Duracion}
-              onChange={(e) => setEditData({ ...editData, Duracion: e.target.value })}
-              required
-            />
-          </div>
-          <div>
-            <label>Precio:</label>
-            <input
-              type="text"
-              value={editData.precio}
-              onChange={(e) => setEditData({ ...editData, precio: e.target.value })}
-              required
-            />
-          </div>
-          <div>
-            <label>Tipo de vehiculo:</label>
-            <input
-              type="text"
-              value={editData.vehicletype}
-              onChange={(e) => setEditData({ ...editData, vehicletype: e.target.value })}
-              required
-            />
-          </div>
-          <button type="submit">Guardar</button>
+        <form onSubmit={handleSubmit}>
+          <Form
+            fields={[
+              { name: 'Duracion', label: 'Duración', type: 'number', required: true },
+              { name: 'precio', label: 'Precio', type: 'number', required: true },
+              { name: 'vehicletype', label: 'Tipo de vehículo', type: 'select', options: ['Moto', 'Carro'], required: true },
+            ]}
+            initialData={editData}
+            onChange={handleChange}
+          />
+          <button type="submit" className="bg-blue-600 cursor-pointer text-white px-4 py-2 rounded mt-4">
+            Guardar
+          </button>
         </form>
       </Modal>
     </CommonLayout>
