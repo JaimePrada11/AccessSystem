@@ -17,7 +17,7 @@ const getRandomUserImages = async () => {
   return results.map(user => user.picture.large);
 };
 
-const validatePhone = (phone) => /^\d{7,10}$/.test(phone);
+const validatePhone = (telefono) => /^\d{7,10}$/.test(telefono);
 
 const CompanyInfo = () => {
   const { id } = useParams();
@@ -26,7 +26,7 @@ const CompanyInfo = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({ name: '', cedula: '', phone: '', type: 'visitante' });
+  const [editData, setEditData] = useState({ name: '', cedula: '', telefono: '', type: 'visitante' });
   const [phoneError, setPhoneError] = useState('');
 
   useEffect(() => {
@@ -75,7 +75,7 @@ const CompanyInfo = () => {
     event.preventDefault();
     console.log("Datos del formulario:", editData);
 
-    if (!validatePhone(editData.phone)) {
+    if (!validatePhone(editData.telefono)) {
       setPhoneError('Número de teléfono no válido');
       return;
     }
@@ -96,6 +96,8 @@ const CompanyInfo = () => {
         })
         .then((response) => {
           console.log("Datos actualizados con éxito:", response.data);
+          // Refrescar los datos después de actualizar
+          fetchAndUpdateData();
         })
         .catch(error => console.error("Error al actualizar la persona:", error));
       } else {
@@ -109,12 +111,14 @@ const CompanyInfo = () => {
           },
         })
         .then((response) => {
-          console.log("Datos actualizados con éxito:", response.data);
+          console.log("Datos creados con éxito:", response.data);
+          // Refrescar los datos después de crear
+          fetchAndUpdateData();
         })
-        .catch(error => console.error("Error al actualizar la persona:", error));
+        .catch(error => console.error("Error al crear la persona:", error));
       }
 
-      setEditData({ name: '', cedula: '', phone: '', type: 'visitante', id: null });
+      setEditData({ name: '', cedula: '', telefono: '', type: 'visitante', id: null });
       setIsEditing(false);
       setModalOpen(false);
     } catch (error) {
@@ -122,17 +126,35 @@ const CompanyInfo = () => {
     }
   };
 
+  // Función para obtener los datos actualizados
+  const fetchAndUpdateData = async () => {
+    try {
+      const response = await axiosInstance.get(`/company/${id}`);
+      const userImages = await getRandomUserImages();
+      const mappedData = response.data.peopleList.map((person, index) => ({
+        id: person.id,
+        image: userImages[index % userImages.length],
+        primary: person.name,
+        secondary: `CC. ${person.cedula} Phone ${person.telefono}`,
+        tertiary: `${person.personType ? 'Empleado' : 'Visitante'}, Compañía: ${response.data.name}`,
+      }));
+      setFilteredData(mappedData);
+    } catch (error) {
+      console.error('Error al obtener los datos:', error);
+    }
+  };
+
   const handleEdit = (item) => {
     console.log("Editando persona:", item); 
 
-    const [primary, cedula, phone] = item.secondary.split(' ');
+    const [primary, cedula, telefono] = item.secondary.split(' ');
     const type = item.tertiary.includes('Empleado') ? 'empleado' : 'visitante';
 
     setEditData({
       id: item.id,
       name: item.primary,
       cedula: cedula.slice(3),
-      phone: phone ? phone.slice(6) : '',  
+      telefono: telefono ? telefono.slice(6) : '',  
       type,
     });
 
@@ -142,14 +164,19 @@ const CompanyInfo = () => {
 
   const handleDelete = async (id) => {
     try {
-      await removeItem(id);
+      await axiosInstance.delete(`/people/${id}`)
+        .then((response) => {
+          console.log("Datos eliminados con éxito:", response.data);
+          // Refrescar los datos después de eliminar
+          fetchAndUpdateData();
+        });
     } catch (error) {
-      console.error('Error eliminando persona:', error);
+      console.error("Error al eliminar la persona:", error);
     }
   };
 
   const handleAddNew = () => {
-    setEditData({ name: '', cedula: '', phone: '', type: 'visitante' });
+    setEditData({ name: '', cedula: '', telefono: '', type: 'visitante' });
     setIsEditing(false);
     setModalOpen(true);
   };
@@ -181,7 +208,7 @@ const CompanyInfo = () => {
               key={item.id}
               data={item}
               onEdit={handleEdit}
-              onDelete={handleDelete}
+              onDelete={() => handleDelete(item.id)}
               path={`/people/${item.id}`}
             />
           ))}
@@ -194,7 +221,7 @@ const CompanyInfo = () => {
             fields={[
               { name: 'name', label: 'Nombre', type: 'text', required: true },
               { name: 'cedula', label: 'Cédula', type: 'text', required: true },
-              { name: 'phone', label: 'Teléfono', type: 'text', required: true },
+              { name: 'telefono', label: 'telefono', type: 'text', required: true },
               { name: 'type', label: 'Tipo', type: 'select', options: ['visitante', 'empleado'], required: true },
             ]}
             initialData={editData}

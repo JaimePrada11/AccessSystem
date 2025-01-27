@@ -7,7 +7,7 @@ import Form from '../../components/Form';
 import useApi from '../../Services/apiService';
 
 const getRandomUserImages = async () => {
-  const response = await fetch('https://randomuser.me/api/?results=5');
+  const response = await fetch('https://randomuser.me/api/?results=50');
   if (!response.ok) {
     throw new Error('Error fetching user data');
   }
