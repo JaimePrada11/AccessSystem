@@ -5,9 +5,10 @@ import { Link } from 'react-router-dom';
 import Modal from '../../components/Modal';
 import CommonLayout from '../../components/CommonLayout';
 import useApi from '../../hooks/useData';
+import axiosInstance from '../../Services/apiService';
 
 const Companies = () => {
-  const { data, loading, error, createItem, updateItem, removeItem } = useApi('/company');
+  const { data, loading, error, postData, putData, deleteData } = useApi('/company');
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -36,16 +37,26 @@ const Companies = () => {
 
     const newCompany = { name: editData.name.trim() };
 
-    if (editMode) {
-      await updateItem(editData.id_company, newCompany);
-    } else {
-      await createItem(newCompany);
-    }
+    try {
+      if (editMode) {
+        await putData(editData.id_company, newCompany);
+        setFilteredData(prevData => prevData.map(company => 
+          company.id_company === editData.id_company 
+          ? { ...company, name: newCompany.name }
+          : company
+        ));
+      } else {
+         await postData(newCompany);
+      }
 
-    setEditData({ id_company: null, name: '' });
-    setEditMode(false);
-    setModalOpen(false);
-    setValidationError('');
+      fetchAndUpdateData()
+      setEditData({ id_company: null, name: '' });
+      setEditMode(false);
+      setModalOpen(false);
+      setValidationError('');
+    } catch (error) {
+      console.error('Error al guardar los datos:', error);
+    }
   };
 
   const handleEdit = (company) => {
@@ -55,7 +66,22 @@ const Companies = () => {
   };
 
   const handleDelete = async (id) => {
-    await removeItem(id);
+    try {
+      await deleteData(id);
+      setFilteredData(prevData => prevData.filter(company => company.id_company !== id)); 
+      fetchAndUpdateData();
+    } catch (error) {
+      console.error('Error al eliminar los datos:', error);
+    }
+  };
+
+  const fetchAndUpdateData = async () => {
+    try {
+      const response = await axiosInstance.get('/company');
+      setFilteredData(response.data);
+    } catch (error) {
+      console.error('Error al obtener los datos:', error);
+    }
   };
 
   const handleAddNew = () => {
@@ -99,13 +125,13 @@ const Companies = () => {
                   className="px-3 cursor-pointer py-1 rounded-md flex items-center transition-transform duration-300 hover:scale-105"
                   onClick={() => handleEdit(item)}
                 >
-                  <FaEdit className="text-blue-500 text-xl" /> 
+                  <FaEdit className="text-blue-500 text-xl" />
                 </button>
                 <button
                   className="px-3 cursor-pointer py-1 rounded-md flex items-center transition-transform duration-300 hover:scale-105"
                   onClick={() => handleDelete(item.id_company)}
                 >
-                  <MdDelete className="text-red-500 text-xl" /> 
+                  <MdDelete className="text-red-500 text-xl" />
                 </button>
               </div>
             </div>
