@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../../components/Modal';
-import CommonLayout from '../../CommonLayout';
+import CommonLayout from '../../components/CommonLayout';
 import List from '../../components/Cards/List';
 import CardItem from '../../components/Cards/CardItem';
 import Form from '../../components/Form';

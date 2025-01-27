@@ -1,8 +1,8 @@
 // src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Login from './components/Logins/login';
-import SignIn from './components/Logins/SingIn';
+import Login from './pages/Logins/login';
+import SignIn from './pages/Logins/SingIn';
 import Layout from './layout';
 import MainContainer from './pages/main';
 import Companies from './pages/Companies';
