@@ -1,50 +1,40 @@
-import React, { useState } from 'react';
 
-const Form = ({ fields, onSubmit, initialData }) => {
-    const [formData, setFormData] = useState(initialData);
+import React from 'react';
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onSubmit(formData);
-    };
-
-    return (
-        <form onSubmit={handleSubmit}>
-            {fields.map((field) => (
-                <label key={field.name} className="block mb-2">
-                    {field.label}:
-                    {field.type === 'select' ? (
-                        <select
-                            name={field.name}
-                            value={formData[field.name]}
-                            onChange={handleChange}
-                            className="w-full p-2 mt-1 border border-gray-300 rounded"
-                            required={field.required}
-                        >
-                            {field.options.map((option) => (
-                                <option key={option} value={option}>{option}</option>
-                            ))}
-                        </select>
-                    ) : (
-                        <input
-                            type={field.type}
-                            name={field.name}
-                            value={formData[field.name]}
-                            onChange={handleChange}
-                            className="w-full p-2 mt-1 border border-gray-300 rounded"
-                            required={field.required}
-                        />
-                    )}
-                </label>
-            ))}
-            <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded mt-4">Save</button>
-        </form>
-    );
+const Form = ({ fields, initialData, onChange }) => {
+  return (
+    <>
+      {fields.map(field => (
+        <div key={field.name}>
+          <label htmlFor={field.name} className="block mb-2" >{field.label}</label>
+          {field.type === 'select' ? (
+            <select
+              id={field.name}
+              name={field.name}
+              value={initialData[field.name]}
+              onChange={onChange}
+              className="w-full p-2 mt-1 border border-gray-300 rounded"
+              required={field.required}
+            >
+              {field.options.map(option => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+          ) : (
+            <input
+              type={field.type}
+              id={field.name}
+              name={field.name}
+              value={initialData[field.name]}
+              onChange={onChange}
+              className="w-full p-2 mt-1 border border-gray-300 rounded"
+              required={field.required}
+            />
+          )}
+        </div>
+      ))}
+    </>
+  );
 };
 
 export default Form;

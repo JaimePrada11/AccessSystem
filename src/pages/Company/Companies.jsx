@@ -7,7 +7,7 @@ import CommonLayout from '../../components/CommonLayout';
 import useApi from '../../hooks/useData';
 
 const Companies = () => {
-  const { data, loading, error, createItem, updateItem, removeItem, fetchData } = useApi('/company');
+  const { data, loading, error, createItem, updateItem, removeItem } = useApi('/company');
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -25,7 +25,6 @@ const Companies = () => {
       setFilteredData([]);
     }
   }, [searchTerm, data]);
-
 
   const handleSubmit = async (event) => {
     event.preventDefault();

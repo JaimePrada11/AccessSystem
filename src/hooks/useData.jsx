@@ -7,50 +7,52 @@ const useApi = (endpoint) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const getData = async () => {
+    const fetchData = async () => {
       try {
-        const result = await axiosInstance.get(endpoint);
-        setData(result.data);
+        const response = await axiosInstance.get(endpoint);
+        setData(response.data);
+        setLoading(false);
       } catch (error) {
-        setError('Error fetching data');
-      } finally {
+        setError(error);
         setLoading(false);
       }
     };
-
-    getData();
+    fetchData();
   }, [endpoint]);
 
-  const createItem = async (newItem) => {
+  const postData = async (newData) => {
     try {
-      const result = await axiosInstance.post(endpoint, newItem);
-      setData([...data, result.data]);
+      const response = await axiosInstance.post(endpoint, newData);
+      setData((prevData) => [...prevData, response.data]);
+      return response.data;
     } catch (error) {
-      setError('Error creating item');
+      setError(error);
+      throw error;
     }
   };
 
-  const updateItem = async (id, updatedItem) => {
+  const putData = async (id, updatedData) => {
     try {
-      const result = await axiosInstance.put(`${endpoint}/${id}`, updatedItem);
-      const updatedData = data.map((item) => (item.id === id ? result.data : item));
-      setData(updatedData);
+      const response = await axiosInstance.put(`${endpoint}/${id}`, updatedData);
+      setData((prevData) => prevData.map((item) => (item.id === id ? response.data : item)));
+      return response.data;
     } catch (error) {
-      setError('Error updating item');
+      setError(error);
+      throw error;
     }
   };
 
-  const removeItem = async (id) => {
+  const deleteData = async (id) => {
     try {
       await axiosInstance.delete(`${endpoint}/${id}`);
-      const updatedData = data.filter((item) => item.id !== id);
-      setData(updatedData);
+      setData((prevData) => prevData.filter((item) => item.id !== id));
     } catch (error) {
-      setError('Error deleting item');
+      setError(error);
+      throw error;
     }
   };
 
-  return { data, loading, error, createItem, updateItem, removeItem };
+  return { data, loading, error, postData, putData, deleteData };
 };
 
 export default useApi;

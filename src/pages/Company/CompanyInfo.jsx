@@ -5,24 +5,23 @@ import CommonLayout from '../../components/CommonLayout';
 import List from '../../components/Cards/List';
 import CardItem from '../../components/Cards/CardItem';
 import Form from '../../components/Form';
-import useApi from '../../Services/apiService';
+import useApi from '../../hooks/useData';
+import axiosInstance from '../../Services/apiService';
 
 const getRandomUserImages = async () => {
-  const response = await fetch('https://randomuser.me/api/?results=5');
+  const response = await fetch('https://randomuser.me/api/?results=50');
   if (!response.ok) {
     throw new Error('Error fetching user data');
   }
-  return response.json().then(data => data.results.map(user => user.picture.large));
+  const { results } = await response.json();
+  return results.map(user => user.picture.large);
 };
 
-const validatePhone = (phone) => {
-  const phoneRegex = /^\d{7,10}$/; 
-  return phoneRegex.test(phone);
-};
+const validatePhone = (phone) => /^\d{7,10}$/.test(phone);
 
 const CompanyInfo = () => {
   const { id } = useParams();
-  const { data, loading, error, createItem, updateItem, removeItem } = useApi(`/company/${id}`);
+  const { data, loading, error, createItem, removeItem } = useApi(`/company/${id}`);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -31,87 +30,121 @@ const CompanyInfo = () => {
   const [phoneError, setPhoneError] = useState('');
 
   useEffect(() => {
-    if (data && data.peopleList && data.peopleList.length > 0) {
-      getRandomUserImages().then(userImages => {
-        const mappedData = data.peopleList.map((person, index) => ({
-          id: person.id, // Aseguramos que el id esté presente aquí
-          image: userImages[index % userImages.length],
-          primary: person.name,
-          secondary: `CC. ${person.cedula} Phone ${person.telefono}`,
-          tertiary: `Tipo: ${person.personType ? 'Empleado' : 'Visitante'}, Compañía: ${data.name}`,
-          additional: person.carnet ? `Carnet: ${person.carnet.code} (Estado: ${person.carnet.status ? 'Activo' : 'Inactivo'})` : 'Carnet: No disponible'
-        }));
-        setFilteredData(mappedData);
-      }).catch(error => {
-        console.error('Error fetching user images:', error);
-      });
-    } else {
-      console.log('No data in peopleList');
+    if (data?.peopleList?.length) {
+      getRandomUserImages()
+        .then(userImages => {
+          const mappedData = data.peopleList.map((person, index) => ({
+            id: person.id,
+            image: userImages[index % userImages.length],
+            primary: person.name,
+            secondary: `CC. ${person.cedula} Phone ${person.telefono}`,
+            tertiary: `${person.personType ? 'Empleado' : 'Visitante'}, Compañía: ${data.name}`,
+          }));
+          setFilteredData(mappedData);
+        })
+        .catch(error => console.error('Error fetching user images:', error));
     }
   }, [data]);
 
   useEffect(() => {
-    const filtered = filteredData.filter(person =>
-      person.primary.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredData(filtered);
-  }, [searchTerm]);
+    if (searchTerm) {
+      const filtered = filteredData.filter(person =>
+        person.primary.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        person.secondary.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredData(filtered);
+    } else {
+      if (data?.peopleList?.length) {
+        getRandomUserImages()
+          .then(userImages => {
+            const mappedData = data.peopleList.map((person, index) => ({
+              id: person.id,
+              image: userImages[index % userImages.length],
+              primary: person.name,
+              secondary: `CC. ${person.cedula} Phone ${person.telefono}`,
+              tertiary: `${person.personType ? 'Empleado' : 'Visitante'}, Compañía: ${data.name}`,
+            }));
+            setFilteredData(mappedData);
+          })
+          .catch(error => console.error('Error fetching user images:', error));
+      }
+    }
+  }, [searchTerm, data]);
 
-  const handleSubmit = async (newData) => {
-    if (!validatePhone(newData.phone)) {
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    console.log("Datos del formulario:", editData);
+
+    if (!validatePhone(editData.phone)) {
       setPhoneError('Número de teléfono no válido');
       return;
     }
-    setPhoneError('');
 
-    const personType = newData.type === 'empleado';
+    setPhoneError('');
+    const personType = editData.type === 'empleado';
 
     try {
-      let createdItem;
       if (isEditing) {
-        createdItem = await updateItem(newData.id, { ...newData, personType }); 
+        console.log("Actualizando persona con id:", editData.id);  
+        await axiosInstance.put(`/people/${editData.id}`, { 
+          ...editData, 
+          personType 
+        }, {
+          headers: {
+            "Content-Type": "application/json",  
+          },
+        })
+        .then((response) => {
+          console.log("Datos actualizados con éxito:", response.data);
+        })
+        .catch(error => console.error("Error al actualizar la persona:", error));
       } else {
-        createdItem = await createItem({ ...newData, personType }); // Creamos el nuevo elemento
+        console.log("Creando persona con id:", editData.id);
+        await axiosInstance.post(`/company/${id}`, { 
+          ...editData, 
+          personType 
+        }, {
+          headers: {
+            "Content-Type": "application/json",  
+          },
+        })
+        .then((response) => {
+          console.log("Datos actualizados con éxito:", response.data);
+        })
+        .catch(error => console.error("Error al actualizar la persona:", error));
       }
 
-      // Actualizamos el estado de la aplicación con el nuevo elemento creado
-      if (createdItem) {
-        setFilteredData(prevData => [...prevData, { ...createdItem, id: createdItem.id }]);
-      }
-
+      setEditData({ name: '', cedula: '', phone: '', type: 'visitante', id: null });
+      setIsEditing(false);
       setModalOpen(false);
-      setIsEditing(false)
-      setEditData({ name: '', cedula: '', phone: '', type: 'visitante' });
     } catch (error) {
-      console.error('Error al crear el item:', error);
+      console.error('Error guardando datos:', error);
     }
   };
 
   const handleEdit = (item) => {
-    const secondarySplit = item.secondary ? item.secondary.split(' ') : [];
-    const primary = item.primary || '';
-    const cedula = secondarySplit.length > 1 ? secondarySplit[1] : '';
-    const phone = secondarySplit.length > 3 ? secondarySplit[3] : '';
-    const type = item.tertiary && item.tertiary.includes('Empleado') ? 'empleado' : 'visitante';
+    console.log("Editando persona:", item); 
+
+    const [primary, cedula, phone] = item.secondary.split(' ');
+    const type = item.tertiary.includes('Empleado') ? 'empleado' : 'visitante';
 
     setEditData({
-      id: item.id, // Aseguramos que el id esté presente aquí
-      name: primary,
-      cedula: cedula,
-      phone: phone,
-      type: type
+      id: item.id,
+      name: item.primary,
+      cedula: cedula.slice(3),
+      phone: phone ? phone.slice(6) : '',  
+      type,
     });
 
     setIsEditing(true);
     setModalOpen(true);
   };
 
-  const handleDelete = async (item) => {
+  const handleDelete = async (id) => {
     try {
-      await removeItem(item.id); // Utilizamos el id del elemento a eliminar
-
+      await removeItem(id);
     } catch (error) {
-      console.error('Error al eliminar el item:', error);
+      console.error('Error eliminando persona:', error);
     }
   };
 
@@ -121,10 +154,18 @@ const CompanyInfo = () => {
     setModalOpen(true);
   };
 
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setEditData(prevData => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
   return (
     <CommonLayout
       titleImage="https://images.pexels.com/photos/417192/pexels-photo-417192.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-      searchPlaceholder="Search by Name"
+      searchPlaceholder="Search by name or Cédula"
       searchValue={searchTerm}
       onSearchChange={(e) => setSearchTerm(e.target.value)}
       onAddNew={handleAddNew}
@@ -134,29 +175,36 @@ const CompanyInfo = () => {
       ) : error ? (
         <p>{error}</p>
       ) : (
-          <List>
-            {filteredData.map((item, index) => (
-              <CardItem
-                key={index}
-                data={item}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              />
-            ))}
-          </List>
+        <List>
+          {filteredData.map((item) => (
+            <CardItem
+              key={item.id}
+              data={item}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              path={`/people/${item.id}`}
+            />
+          ))}
+        </List>
       )}
+
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
-        <Form
-          fields={[
-            { name: 'name', label: 'Name', type: 'text', required: true },
-            { name: 'cedula', label: 'Cedula', type: 'text', required: true },
-            { name: 'phone', label: 'Phone', type: 'text', required: true },
-            { name: 'type', label: 'Type', type: 'select', options: ['visitante', 'empleado'], required: true }
-          ]}
-          onSubmit={handleSubmit}
-          initialData={editData}
-        />
-        {phoneError && <p style={{ color: 'red' }}>{phoneError}</p>}
+        <form onSubmit={handleSubmit}>
+          <Form
+            fields={[
+              { name: 'name', label: 'Nombre', type: 'text', required: true },
+              { name: 'cedula', label: 'Cédula', type: 'text', required: true },
+              { name: 'phone', label: 'Teléfono', type: 'text', required: true },
+              { name: 'type', label: 'Tipo', type: 'select', options: ['visitante', 'empleado'], required: true },
+            ]}
+            initialData={editData}
+            onChange={handleChange}
+          />
+          {phoneError && <p style={{ color: 'red' }}>{phoneError}</p>}
+          <button type="submit" className="bg-blue-600 cursor-pointer text-white px-4 py-2 rounded mt-4">
+            Guardar
+          </button>
+        </form>
       </Modal>
     </CommonLayout>
   );
