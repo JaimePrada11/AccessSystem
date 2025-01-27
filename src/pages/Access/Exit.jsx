@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import Modal from '../components/Modal';
-import CommonLayout from '../CommonLayout';
-import List from '../components/Cards/List';
-import CardItem from '../components/Cards/CardItem';
-import Form from '../components/Form';
+import Modal from '../../components/Modal';
+import CommonLayout from '../../CommonLayout';
+import List from '../../components/Cards/List';
+import CardItem from '../../components/Cards/CardItem';
+import Form from '../../components/Form';
 import useApi from '../hooks/useApi';
 
 const Access = () => {
-  const { data, loading, error, createItem, updateItem, removeItem } = useApi('/access');
-  const { data: peopleData, loading: peopleLoading, error: peopleError } = useApi('/people');
+  const { data, loading, error, createItem, updateItem, removeItem } = useApi('/access/');
+  const { data: peopleData, loading: peopleLoading, error: peopleError } = useApi('/people/');
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -17,12 +17,13 @@ const Access = () => {
 
   useEffect(() => {
     if (Array.isArray(data) && Array.isArray(peopleData)) {
-      const mappedData = data.map((access) => {
+      const filteredEntries = data.filter(access => !access.exitAccess); // Filtrar accesos sin fecha de salida
+      const mappedData = filteredEntries.map(access => {
         const person = peopleData.find(person => person.id === access.people);
         return {
           id: access.idAccess,
           primary: `${person ? person.name : 'Unknown'} (CC. ${person ? person.cedula : 'N/A'})`,
-          secondary: `Entrada: ${access.entryAccess}, Salida: ${access.exitAccess}`,
+          secondary: `Entrada: ${access.entryAccess}`,
           tertiary: `Tipo: ${access.accessType ? 'Autorizado' : 'No Autorizado'}`,
           additional: `Notas: ${access.accessNotes.map(note => note.note).join(', ')}`,
           porters: access.porters.join(', ')
@@ -50,14 +51,10 @@ const Access = () => {
   };
 
   const handleEdit = (item) => {
-    const secondarySplit = item.secondary.split(', ');
-    const entryAccess = secondarySplit[0].split(': ')[1];
-    const exitAccess = secondarySplit[1].split(': ')[1];
-    
     setEditData({
       id: item.id,
-      entryAccess: entryAccess,
-      exitAccess: exitAccess,
+      entryAccess: item.secondary.split(': ')[1],
+      exitAccess: '',  // Dejar en blanco ya que es un ingreso sin fecha de salida
       accessType: item.tertiary.includes('Autorizado'),
       notes: item.additional.split(': ')[1],
       porters: item.porters.split(', ')
@@ -104,7 +101,7 @@ const Access = () => {
         <Form
           fields={[
             { name: 'entryAccess', label: 'Fecha de Entrada', type: 'text', required: true },
-            { name: 'exitAccess', label: 'Fecha de Salida', type: 'text', required: true },
+            { name: 'exitAccess', label: 'Fecha de Salida', type: 'text', required: false },  // Campo opcional
             { name: 'accessType', label: 'Tipo de Acceso', type: 'checkbox', options: ['Autorizado'], required: true },
             { name: 'notes', label: 'Notas', type: 'text', required: true },
             { name: 'porters', label: 'Porteros', type: 'text', required: true }

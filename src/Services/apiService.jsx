@@ -1,38 +1,50 @@
-const API_BASE_URL = 'http://localhost:8083/api';
+import axios from "axios";
+
+const axiosInstance = axios.create({
+  baseURL: "http://localhost:8083/api/",
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export default axiosInstance;
 
 export const fetchData = async (endpoint) => {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`);
-  const data = await response.json();
-  return data;
+  try {
+    const response = await axiosInstance.get(endpoint);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data', error);
+    throw error;
+  }
 };
 
 export const postData = async (endpoint, newData) => {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(newData),
-  });
-  const data = await response.json();
-  return data;
+  try {
+    const response = await axiosInstance.post(endpoint, newData);
+    return response.data;
+  } catch (error) {
+    console.error('Error posting data', error);
+    throw error;
+  }
 };
 
 export const putData = async (endpoint, updatedData) => {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(updatedData),
-  });
-  const data = await response.json();
-  return data;
+  try {
+    const response = await axiosInstance.put(endpoint, updatedData);
+    return response.data;
+  } catch (error) {
+    console.error('Error putting data', error);
+    throw error;
+  }
 };
 
 export const deleteData = async (endpoint) => {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    method: 'DELETE',
-  });
-  return response.ok;
+  try {
+    const response = await axiosInstance.delete(endpoint);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting data', error);
+    throw error;
+  }
 };

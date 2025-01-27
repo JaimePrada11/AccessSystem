@@ -9,13 +9,13 @@ const CardItem = ({ data, onEdit, onDelete }) => {
                 <img src={data.image} alt="" width="60" height="88" className="rounded-md bg-slate-100" />
                 <div className="flex items-center space-x-2 mt-2">
                     <button
-                        onClick={onEdit}
+                        onClick={() => onEdit(data)} // Pasamos el objeto data a la función
                         className="px-3 py-1 rounded-md flex items-center transition-transform duration-300 hover:scale-105"
                     >
                         <FaEdit className="text-blue-500 text-xl" />
                     </button>
                     <button
-                        onClick={onDelete}
+                        onClick={() => onDelete(data)} // Pasamos el objeto data a la función
                         className="px-3 py-1 rounded-md flex items-center transition-transform duration-300 hover:scale-105"
                     >
                         <MdDelete className="text-red-500 text-xl" />
@@ -28,7 +28,7 @@ const CardItem = ({ data, onEdit, onDelete }) => {
                     <div className="w-full flex items-center">
                         <dd>{data.secondary}</dd>
                     </div>
-                    <div className=" flex items-center mt-2">
+                    <div className="flex items-center mt-2">
                         <dd>{data.tertiary}</dd>
                     </div>
                     <div className="w-full flex items-center mt-2 font-normal">

@@ -4,7 +4,7 @@ import { MdOutlineAddCircleOutline, MdDelete } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import Modal from '../components/Modal';
 import CommonLayout from '../CommonLayout';
-import useApi from '../hooks/useApi';
+import useApi from '../Services/apiService';
 
 const Companies = () => {
   const { data, loading, error, createItem, updateItem, removeItem, fetchData } = useApi('/company');

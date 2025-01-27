@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchData, postData, putData, deleteData } from '../Services/apiService';
+import axiosInstance from '../Services/apiService';
 
 const useApi = (endpoint) => {
   const [data, setData] = useState([]);
@@ -9,8 +9,8 @@ const useApi = (endpoint) => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const result = await fetchData(endpoint);
-        setData(result);
+        const result = await axiosInstance.get(endpoint);
+        setData(result.data);
       } catch (error) {
         setError('Error fetching data');
       } finally {
@@ -23,8 +23,8 @@ const useApi = (endpoint) => {
 
   const createItem = async (newItem) => {
     try {
-      const result = await postData(endpoint, newItem);
-      setData([...data, result]);
+      const result = await axiosInstance.post(endpoint, newItem);
+      setData([...data, result.data]);
     } catch (error) {
       setError('Error creating item');
     }
@@ -32,8 +32,8 @@ const useApi = (endpoint) => {
 
   const updateItem = async (id, updatedItem) => {
     try {
-      const result = await putData(`${endpoint}/${id}`, updatedItem);
-      const updatedData = data.map((item) => (item.id === id ? result : item));
+      const result = await axiosInstance.put(`${endpoint}/${id}`, updatedItem);
+      const updatedData = data.map((item) => (item.id === id ? result.data : item));
       setData(updatedData);
     } catch (error) {
       setError('Error updating item');
@@ -42,7 +42,7 @@ const useApi = (endpoint) => {
 
   const removeItem = async (id) => {
     try {
-      await deleteData(`${endpoint}/${id}`);
+      await axiosInstance.delete(`${endpoint}/${id}`);
       const updatedData = data.filter((item) => item.id !== id);
       setData(updatedData);
     } catch (error) {

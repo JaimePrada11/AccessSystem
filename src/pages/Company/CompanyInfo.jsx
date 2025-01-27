@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import Modal from '../components/Modal';
-import CommonLayout from '../CommonLayout';
-import List from '../components/Cards/List';
-import CardItem from '../components/Cards/CardItem';
-import Form from '../components/Form';
-import useApi from '../hooks/useApi';
+import { useParams } from 'react-router-dom';
+import Modal from '../../components/Modal';
+import CommonLayout from '../../CommonLayout';
+import List from '../../components/Cards/List';
+import CardItem from '../../components/Cards/CardItem';
+import Form from '../../components/Form';
+import useApi from '../../Services/apiService';
 
 const getRandomUserImages = async () => {
   const response = await fetch('https://randomuser.me/api/?results=5');
@@ -13,6 +13,11 @@ const getRandomUserImages = async () => {
     throw new Error('Error fetching user data');
   }
   return response.json().then(data => data.results.map(user => user.picture.large));
+};
+
+const validatePhone = (phone) => {
+  const phoneRegex = /^\d{7,10}$/; 
+  return phoneRegex.test(phone);
 };
 
 const CompanyInfo = () => {
@@ -23,16 +28,18 @@ const CompanyInfo = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({ name: '', cedula: '', phone: '', type: 'visitante' });
+  const [phoneError, setPhoneError] = useState('');
 
   useEffect(() => {
     if (data && data.peopleList && data.peopleList.length > 0) {
       getRandomUserImages().then(userImages => {
         const mappedData = data.peopleList.map((person, index) => ({
+          id: person.id, // Aseguramos que el id esté presente aquí
           image: userImages[index % userImages.length],
           primary: person.name,
           secondary: `CC. ${person.cedula} Phone ${person.telefono}`,
           tertiary: `Tipo: ${person.personType ? 'Empleado' : 'Visitante'}, Compañía: ${data.name}`,
-          additional: `Carnet: ${person.carnet.code} (Estado: ${person.carnet.status ? 'Activo' : 'Inactivo'})`
+          additional: person.carnet ? `Carnet: ${person.carnet.code} (Estado: ${person.carnet.status ? 'Activo' : 'Inactivo'})` : 'Carnet: No disponible'
         }));
         setFilteredData(mappedData);
       }).catch(error => {
@@ -51,13 +58,33 @@ const CompanyInfo = () => {
   }, [searchTerm]);
 
   const handleSubmit = async (newData) => {
-    if (isEditing) {
-      await updateItem(newData.id, newData);
-    } else {
-      await createItem({ ...newData, id: data.length + 1 });
+    if (!validatePhone(newData.phone)) {
+      setPhoneError('Número de teléfono no válido');
+      return;
     }
-    setModalOpen(false);
-    setEditData({ name: '', cedula: '', phone: '', type: 'visitante' });
+    setPhoneError('');
+
+    const personType = newData.type === 'empleado';
+
+    try {
+      let createdItem;
+      if (isEditing) {
+        createdItem = await updateItem(newData.id, { ...newData, personType }); 
+      } else {
+        createdItem = await createItem({ ...newData, personType }); // Creamos el nuevo elemento
+      }
+
+      // Actualizamos el estado de la aplicación con el nuevo elemento creado
+      if (createdItem) {
+        setFilteredData(prevData => [...prevData, { ...createdItem, id: createdItem.id }]);
+      }
+
+      setModalOpen(false);
+      setIsEditing(false)
+      setEditData({ name: '', cedula: '', phone: '', type: 'visitante' });
+    } catch (error) {
+      console.error('Error al crear el item:', error);
+    }
   };
 
   const handleEdit = (item) => {
@@ -68,7 +95,7 @@ const CompanyInfo = () => {
     const type = item.tertiary && item.tertiary.includes('Empleado') ? 'empleado' : 'visitante';
 
     setEditData({
-      id: item.id,
+      id: item.id, // Aseguramos que el id esté presente aquí
       name: primary,
       cedula: cedula,
       phone: phone,
@@ -79,9 +106,13 @@ const CompanyInfo = () => {
     setModalOpen(true);
   };
 
-
   const handleDelete = async (item) => {
-    await removeItem(item.id);
+    try {
+      await removeItem(item.id); // Utilizamos el id del elemento a eliminar
+
+    } catch (error) {
+      console.error('Error al eliminar el item:', error);
+    }
   };
 
   const handleAddNew = () => {
@@ -103,7 +134,6 @@ const CompanyInfo = () => {
       ) : error ? (
         <p>{error}</p>
       ) : (
-        <Link to={`/people/${id}`}>
           <List>
             {filteredData.map((item, index) => (
               <CardItem
@@ -114,8 +144,6 @@ const CompanyInfo = () => {
               />
             ))}
           </List>
-        </Link>
-
       )}
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
         <Form
@@ -128,6 +156,7 @@ const CompanyInfo = () => {
           onSubmit={handleSubmit}
           initialData={editData}
         />
+        {phoneError && <p style={{ color: 'red' }}>{phoneError}</p>}
       </Modal>
     </CommonLayout>
   );

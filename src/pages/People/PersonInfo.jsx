@@ -2,7 +2,7 @@ import React from 'react';
 import CommonLayout from '../CommonLayout';
 import List from '../components/Cards/List';
 import CardItem from '../components/Cards/CardItem';
-import useApi from '../hooks/useApi';
+import useApi from '../Services/apiService';
 import { useParams } from 'react-router-dom';
 
 const UserInfo = () => {
@@ -12,7 +12,7 @@ const UserInfo = () => {
     const mapEquipmentsData = (person) =>
         person.equipments.map((item) => ({
             id: item.id,
-            image: item.image || 'https://via.placeholder.com/60x88',
+            image: item.image || '',
             primary: item.serial,
             secondary: `Fecha de Registro: ${item.registrationDate}`,
             tertiary: `Descripción: ${item.description}`
@@ -21,10 +21,18 @@ const UserInfo = () => {
     const mapVehiclesData = (person) =>
         person.vehicles.map((item) => ({
             id: item.idVehicle,
-            image: item.image || 'https://via.placeholder.com/60x88',
+            image: item.image || '',
             primary: item.plate,
             secondary: `Tipo: ${item.vehicleType ? 'Moto' : 'Carro'}`
         }));
+
+        const invoicesData = (person) =>
+            person.invoices.map((item) => ({
+                id: item.idVehicle,
+                image: item.image || '',
+                primary: item.date,
+                secondary: `Tipo: ${item.status ? 'Moto' : 'Carro'}`
+            }));
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>{`Error: ${error.message || 'Error al cargar los datos'}`}</p>;
@@ -33,6 +41,7 @@ const UserInfo = () => {
     const { name, cedula, telefono, personType, equipments, vehicles, invoices } = data;
     const mappedEquipmentsData = mapEquipmentsData(data);
     const mappedVehiclesData = mapVehiclesData(data);
+    const mappedInvoice = invoicesData(data);
 
     const handleEdit = (id) => {
         console.log(`Edit user or item with ID: ${id}`);
@@ -91,11 +100,16 @@ const UserInfo = () => {
                     <div className="w-full px-2">
                         <h2 className="text-2xl font-semibold mb-4 text-center">Invoices</h2>
                         {invoices?.length > 0 ? (
-                            <ul>
-                                {invoices.map((invoice, index) => (
-                                    <li key={index}>Invoice #{index + 1}</li>
-                                ))}
-                            </ul>
+                             <List>
+                             {mappedInvoice.map((item) => (
+                                 <CardItem
+                                     key={item.id}
+                                     data={item}
+                                     onEdit={() => handleEdit(item.id)}
+                                     onDelete={() => handleDelete(item.id)}
+                                 />
+                             ))}
+                         </List>
                         ) : (
                             <p>No invoices available</p>
                         )}

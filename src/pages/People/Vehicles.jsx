@@ -4,7 +4,7 @@ import Form from '../components/Form';
 import CommonLayout from '../CommonLayout';
 import List from '../components/Cards/List';
 import CardItem from '../components/Cards/CardItem';
-import useApi from '../hooks/useApi';
+import useApi from '../Services/apiService';
 
 export default function Vehicle() {
     const { data, loading, error, createItem, updateItem, removeItem } = useApi('/people'); // URL de la API para obtener personas

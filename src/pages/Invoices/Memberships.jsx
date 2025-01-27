@@ -3,7 +3,7 @@ import Modal from '../components/Modal';
 import CommonLayout from '../CommonLayout';
 import List from '../components/Cards/List';
 import CardItem from '../components/Cards/CardItem';
-import useApi from '../hooks/useApi';
+import useApi from '../Services/apiService';
 
 const Memberships = () => {
   const { data, loading, error, createItem, updateItem, removeItem } = useApi('/membership'); 
