@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react"
+import React, { useState, useContext, useEffect } from "react";
 import { CiUser } from "react-icons/ci";
 import { FaKey } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -7,7 +7,7 @@ import useApi from "../../hooks/useData";
 import UserContext from "../../Context";
 
 const Login = () => {
-    const { data: usuarios, loading, error } = useApi("/user");
+    const { data: porteros, loading, error } = useApi("/porters");
     const { login } = useContext(UserContext);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -23,12 +23,12 @@ const Login = () => {
         setErrors(formErrors);
 
         if (Object.keys(formErrors).length === 0) {
-            const userf = usuarios.find(
-                (usuario) => usuario.userName === username && usuario.password === password
+            const userf = porteros.find(
+                (porter) => porter.user.userName === username && porter.user.password === password
             );
 
             if (userf) {
-                login(userf)
+                login(userf);
                 navigate(`/home`);
             } else {
                 setMessage("Invalid username or password");
@@ -36,14 +36,8 @@ const Login = () => {
         }
     };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        if (name === "username") {
-            setUsername(value);
-        } else if (name === "password") {
-            setPassword(value);
-        }
-    };
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error loading users</div>;
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-900 to-red-100">
@@ -53,29 +47,27 @@ const Login = () => {
                     <div className="space-y-5">
                         <div className="relative flex flex-col">
                             <label htmlFor="username" className="mb-2 font-semibold text-gray-200">Username</label>
-                            <CiUser className="absolute left-3 top-10 text-gray-400" size={24} />
                             <input
                                 type="text"
                                 name="username"
                                 id="username"
                                 placeholder="Enter your username"
-                                className="p-3 pl-12 text-white border-b border-gray-700 bg-transparent placeholder-white focus:outline-none focus:ring-0"
+                                className="p-3 text-white border-b border-gray-700 bg-transparent placeholder-white focus:outline-none focus:ring-0"
                                 value={username}
-                                onChange={handleChange}
+                                onChange={(e) => setUsername(e.target.value)}
                             />
                             {errors.username && <span className="text-red-500 text-sm mt-1">{errors.username}</span>}
                         </div>
                         <div className="relative flex flex-col">
                             <label htmlFor="password" className="mb-2 font-semibold text-gray-200">Password</label>
-                            <FaKey className="absolute left-3 top-10 text-gray-400" size={24} />
                             <input
                                 type="password"
                                 name="password"
                                 id="password"
                                 placeholder="Enter your password"
-                                className="p-3 pl-12 text-white border-b border-gray-700 bg-transparent placeholder-white focus:outline-none focus:ring-0"
+                                className="p-3 text-white border-b border-gray-700 bg-transparent placeholder-white focus:outline-none focus:ring-0"
                                 value={password}
-                                onChange={handleChange}
+                                onChange={(e) => setPassword(e.target.value)}
                             />
                             {errors.password && <span className="text-red-500 text-sm mt-1">{errors.password}</span>}
                         </div>
@@ -88,12 +80,6 @@ const Login = () => {
                     </button>
                     <div className="mt-4">
                         {message && <span className={`text-sm ${message === "Access granted" ? "text-green-500" : "text-red-500"}`}>{message}</span>}
-                    </div>
-                    <div className="flex flex-row items-center justify-center mt-4 text-gray-200">
-                        <p className="mr-2">Don't have an account?</p>
-                        <Link to="/signin" className="text-blue-400 font-semibold hover:text-blue-700 transition duration-300 cursor-pointer">
-                            Sign Up
-                        </Link>
                     </div>
                 </form>
             </section>

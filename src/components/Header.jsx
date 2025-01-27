@@ -1,39 +1,86 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from "react";
+import UserContext from "../Context";
+import { Menu } from "@headlessui/react";
+import { useNavigate } from "react-router";
+
 
 const Header = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const { user, logout } = useContext(UserContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-    
-    return () => clearInterval(timer); 
+
+    return () => clearInterval(timer);
   }, []);
 
-  const user = {
-    name: "John Doe",
-    avatar: "https://images.squarespace-cdn.com/content/v1/656f4e4dababbd7c042c4946/82bec838-05c8-4d68-b173-2284a6ad4e52/how-to-stop-being-a-people-pleaser"
+  const handleLogout = () => {
+    logout();
+    navigate(`/`);
+    console.log("Cerrar sesión"); 
   };
 
   return (
     <header className="header flex justify-between items-center p-4 bg-gray-100 shadow-md">
+      {/* Fecha y hora */}
       <div className="flex items-center space-x-4">
-        <div className="relative flex items-center">
-          <span className="absolute left-3 text-gray-500" size={24}>🕒</span>
-          <div
-            className="w-64 h-10 pl-10 pr-4 py-2 text-gray-800 placeholder-gray-500 rounded-md  focus:outline-none focus:ring-0  flex items-center"
-          >
-            {currentTime.toLocaleTimeString()} {currentTime.toLocaleDateString()}
+        <div className="relative flex items-center justify-center">
+          <div className="w-64 h-10 pl-10 pr-4 py-2 text-gray-800 placeholder-gray-500 rounded-md flex flex-col items-center">
+            <span>{currentTime.toLocaleTimeString()}</span>
+            {currentTime.toLocaleDateString()}
           </div>
         </div>
       </div>
-      
-      <div className="storage_header-profileImg flex items-center space-x-2 mr-5">
-        <div className="storage_header-imgContainer">
-          <img src={user.avatar} alt="User Profile" width={30} height={30} className="rounded-full w-12" />
-        </div>
-        <span className="text-gray-800 font-medium">{user.name}</span>
+
+      {/* Menú del usuario */}
+      <div className="relative">
+        <Menu>
+          {({ open }) => (
+            <>
+              <Menu.Button className="flex items-center space-x-2 focus:outline-none">
+                <div className="storage_header-imgContainer">
+                  <img
+                    src="" // Reemplaza con la URL real de la imagen del usuario
+                    alt="User Profile"
+                    className="rounded-full w-12 h-12"
+                  />
+                </div>
+                <span className="text-gray-800 font-medium">
+                  {user ? user.name : "Guest"}
+                </span>
+              </Menu.Button>
+
+              {open && (
+                <Menu.Items className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <Menu.Item>
+                    {({ active }) => (
+                      <button
+                        className={`${active ? "bg-gray-100" : ""
+                          } w-full px-4 py-2 text-left text-sm text-gray-700`}
+                      >
+                        Ver perfil
+                      </button>
+                    )}
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }) => (
+                      <button
+                        onClick={handleLogout}
+                        className={`${active ? "bg-gray-100" : ""
+                          } w-full px-4 py-2 text-left text-sm text-gray-700`}
+                      >
+                        Cerrar sesión
+                      </button>
+                    )}
+                  </Menu.Item>
+                </Menu.Items>
+              )}
+            </>
+          )}
+        </Menu>
       </div>
     </header>
   );

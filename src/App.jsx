@@ -21,10 +21,10 @@ function App() {
     <UserProvider>
       <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Login />} />
           <Route path="/signin" element={<SignIn />} />
           <Route element={<Layout />}>
-            <Route path="/" element={<MainContainer />} />
+            <Route path="/home" element={<MainContainer />} />
             <Route path="/company" element={<Companies />} />
             <Route path="/people" element={<People />} />
             <Route path="/people/:id" element={<PersonInfo />} />
