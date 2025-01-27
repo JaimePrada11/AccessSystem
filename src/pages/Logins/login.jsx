@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react"
 import { CiUser } from "react-icons/ci";
 import { FaKey } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router";
-import useApi from "../../hooks/useApi";
+import useApi from "../../hooks/useData";
+import UserContext from "../../Context";
 
 const Login = () => {
     const { data: usuarios, loading, error } = useApi("/user");
+    const { login } = useContext(UserContext);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState({});
@@ -26,7 +28,8 @@ const Login = () => {
             );
 
             if (userf) {
-                navigate(`/main`);
+                login(userf)
+                navigate(`/home`);
             } else {
                 setMessage("Invalid username or password");
             }

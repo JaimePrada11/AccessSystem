@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { FaBuilding, FaEdit } from "react-icons/fa";
 import { MdOutlineAddCircleOutline, MdDelete } from "react-icons/md";
 import { Link } from 'react-router-dom';
-import Modal from '../components/Modal';
-import CommonLayout from '../CommonLayout';
-import useApi from '../Services/apiService';
+import Modal from '../../components/Modal';
+import CommonLayout from '../../components/CommonLayout';
+import useApi from '../../hooks/useData';
 
 const Companies = () => {
   const { data, loading, error, createItem, updateItem, removeItem, fetchData } = useApi('/company');

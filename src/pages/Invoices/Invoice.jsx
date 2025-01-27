@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { FaBuilding, FaEdit } from "react-icons/fa";
 import { MdOutlineAddCircleOutline, MdDelete } from "react-icons/md";
 import { Link } from 'react-router-dom';
-import Modal from '../components/Modal';
-import CommonLayout from '../CommonLayout';
-import List from '../components/Cards/List'; // Asegúrate de importar List
-import CardItem from '../components/Cards/CardItem';
+import Modal from '../../components/Modal';
+import CommonLayout from '../../components/CommonLayout';
+import List from '../../components/Cards/List'; 
+import CardItem from '../../components/Cards/CardItem';
 
 const Invoice = () => {
     const [data, setData] = useState([]);

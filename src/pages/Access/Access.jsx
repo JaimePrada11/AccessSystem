@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import Modal from '../components/Modal';
-import CommonLayout from '../CommonLayout';
-import List from '../components/Cards/List';
-import CardItem from '../components/Cards/CardItem';
-import Form from '../components/Form';
-import useApi from '../Services/apiService';
+import Modal from '../../components/Modal';
+import CommonLayout from '../../components/CommonLayout';
+import List from '../../components/Cards/List';
+import CardItem from '../../components/Cards/CardItem';
+import Form from '../../components/Form';
+import useApi from '../../hooks/useData';
 
 const Access = () => {
   const { data, loading, error, createItem, updateItem, removeItem } = useApi('/access');

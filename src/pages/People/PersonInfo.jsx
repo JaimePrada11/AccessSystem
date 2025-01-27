@@ -1,8 +1,8 @@
 import React from 'react';
-import CommonLayout from '../CommonLayout';
-import List from '../components/Cards/List';
-import CardItem from '../components/Cards/CardItem';
-import useApi from '../Services/apiService';
+import CommonLayout from '../../components/CommonLayout';
+import List from '../../components/Cards/List';
+import CardItem from '../../components/Cards/CardItem';
+import useApi from '../../hooks/useData';
 import { useParams } from 'react-router-dom';
 
 const UserInfo = () => {
