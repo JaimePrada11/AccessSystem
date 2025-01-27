@@ -8,7 +8,7 @@ import useApi from '../../hooks/useData';
 import axiosInstance from '../../Services/apiService';
 
 export default function Equipments() {
-  const { data, loading, error, postData, putData, deleteData } = useApi('people/equipments'); 
+  const { data, loading, error, postData, putData, deleteData } = useApi('/people'); 
   const { data: peopleData } = useApi('/people');
   const [filteredData, setFilteredData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -182,3 +182,4 @@ export default function Equipments() {
     </CommonLayout>
   );
 }
+
