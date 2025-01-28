@@ -83,6 +83,9 @@ const Memberships = () => {
       onSearchChange={(e) => setSearchTerm(e.target.value)}
       onAddNew={handleAddNew}
     >
+      <h1 className='text-3xl font-bold'>Memberships</h1>
+
+      
       <List>
         {mappedData.map((item, index) => (
           <CardItem

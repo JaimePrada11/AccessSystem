@@ -193,6 +193,8 @@ const CompanyInfo = () => {
       onSearchChange={(e) => setSearchTerm(e.target.value)}
       onAddNew={handleAddNew}
     >
+      <h2 className='text-3xl font-bold'> Company: {data.name}</h2>
+      <h2>Employees</h2>
       {loading ? (
         <p>Cargando datos...</p>
       ) : error ? (

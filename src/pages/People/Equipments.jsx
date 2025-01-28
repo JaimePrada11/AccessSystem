@@ -8,12 +8,12 @@ import useApi from '../../hooks/useData';
 import axiosInstance from '../../Services/apiService';
 
 export default function Equipments() {
-  const { data, loading, error, postData, putData, deleteData } = useApi('/people'); 
+  const { data, loading, error, postData, putData, deleteData } = useApi('/people');
   const { data: peopleData } = useApi('/people');
   const [filteredData, setFilteredData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({id:'', serial: '', registrationDate: '', description: '', owner: '' });
+  const [editData, setEditData] = useState({ id: '', serial: '', registrationDate: '', description: '', owner: '' });
   const [searchTerm, setSearchTerm] = useState('');
   const [cedula, setCedula] = useState('');
   const [personExists, setPersonExists] = useState(false);
@@ -29,12 +29,12 @@ export default function Equipments() {
       const response = await axiosInstance.get('/people');
       const mappedData = response.data.flatMap(person =>
         (person.equipments || []).map(item => ({
-            id: item.id,
-            image: "https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-            primary: item.serial,
-            secondary: `Fecha de Registro: ${item.registrationDate}`,
-            tertiary: `Descripción: ${item.description}`,
-            additional: `Dueño: ${person.name}`
+          id: item.id,
+          image: "https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+          primary: item.serial,
+          secondary: `Fecha de Registro: ${item.registrationDate}`,
+          tertiary: `Descripción: ${item.description}`,
+          additional: `Dueño: ${person.name}`
         }))
       );
       setFilteredData(mappedData);
@@ -76,7 +76,7 @@ export default function Equipments() {
     }
 
     setModalOpen(false);
-    setEditData({ id:'', serial: '', registrationDate: '', description: '', owner: '' });
+    setEditData({ id: '', serial: '', registrationDate: '', description: '', owner: '' });
   };
 
   const handleEdit = (item) => {
@@ -101,7 +101,7 @@ export default function Equipments() {
     setCedula('');
     setPersonExists(false);
     setValidationError('');
-    setEditData({ id:'', serial: '', registrationDate: '', description: '', owner: '' });
+    setEditData({ id: '', serial: '', registrationDate: '', description: '', owner: '' });
     setPersonId(null); // Reinicia el personId al agregar uno nuevo
     setModalOpen(true);
   };
@@ -131,6 +131,7 @@ export default function Equipments() {
       searchValue={searchTerm}
       onSearchChange={(e) => setSearchTerm(e.target.value)}
       onAddNew={handleAddNew}>
+      <h1 className='text-3xl font-bold'>Equipments</h1>
 
       {loading ? (
         <p>Cargando datos...</p>
@@ -138,7 +139,7 @@ export default function Equipments() {
         <p>{error}</p>
       ) : filteredData.length > 0 ? (
         <List>
-          {filteredData.filter(item => 
+          {filteredData.filter(item =>
             item.primary.toLowerCase().includes(searchTerm.toLowerCase())
           ).map((item, index) => (
             <CardItem

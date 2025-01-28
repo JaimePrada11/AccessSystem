@@ -131,6 +131,7 @@ export default function Vehicle() {
       searchValue={searchTerm}
       onSearchChange={(e) => setSearchTerm(e.target.value)}
       onAddNew={handleAddNew}>
+        <h1 className='text-3xl font-bold'>Vehicles</h1>
 
       {loading ? (
         <p>Cargando datos...</p>

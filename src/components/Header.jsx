@@ -3,8 +3,17 @@ import UserContext from "../Context";
 import { Menu } from "@headlessui/react";
 import { useNavigate } from "react-router";
 
+const getRandomUserImages = async () => {
+  const response = await fetch('https://randomuser.me/api/?results=1');
+  if (!response.ok) {
+    throw new Error('Error fetching user data');
+  }
+  const { results } = await response.json();
+  return results[0].picture.large; 
+};
 
 const Header = () => {
+  const [userImage, setUserImage] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const { user, logout } = useContext(UserContext);
   const navigate = useNavigate();
@@ -15,6 +24,18 @@ const Header = () => {
     }, 1000);
 
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const fetchUserImage = async () => {
+      try {
+        const image = await getRandomUserImages();
+        setUserImage(image);
+      } catch (error) {
+        console.error("Error fetching user image:", error);
+      }
+    };
+    fetchUserImage();
   }, []);
 
   const handleLogout = () => {
@@ -43,7 +64,7 @@ const Header = () => {
               <Menu.Button className="flex items-center space-x-2 focus:outline-none">
                 <div className="storage_header-imgContainer">
                   <img
-                    src="" // Reemplaza con la URL real de la imagen del usuario
+                    src={userImage } // Reemplaza con la URL real de la imagen del usuario
                     alt="User Profile"
                     className="rounded-full w-12 h-12"
                   />

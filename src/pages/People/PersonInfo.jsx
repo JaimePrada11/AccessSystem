@@ -12,7 +12,7 @@ const UserInfo = () => {
     const mapEquipmentsData = (person) =>
         person.equipments.map((item) => ({
             id: item.id,
-            image: item.image || '',
+            image: "https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
             primary: item.serial,
             secondary: `Fecha de Registro: ${item.registrationDate}`,
             tertiary: `Descripción: ${item.description}`,
@@ -21,7 +21,10 @@ const UserInfo = () => {
     const mapVehiclesData = (person) =>
         person.vehicles.map((item) => ({
             id: item.idVehicle,
-            image: item.image || '',
+            image: item.vehicleType
+            ? "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            : "https://images.pexels.com/photos/5803320/pexels-photo-5803320.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+          
             primary: item.plate,
             secondary: `Tipo: ${item.vehicleType ? 'Moto' : 'Carro'}`,
         }));
@@ -29,7 +32,7 @@ const UserInfo = () => {
     const mapInvoicesData = (person) =>
         person.invoices.map((item) => ({
             id: item.idVehicle,
-            image: item.image || '',
+            image: 'https://images.pexels.com/photos/47344/dollar-currency-money-us-dollar-47344.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
             primary: item.date,
             secondary: `Estado: ${item.status ? 'Pagado' : 'Pendiente'}`,
         }));
@@ -39,7 +42,7 @@ const UserInfo = () => {
             .filter(item => item.people === parseInt(id)) 
             .map((item) => ({
                 id: item.idAccess,
-                image: item.image || '',
+                image: 'https://definicion.de/wp-content/uploads/2009/08/puerta.jpg',
                 secondary: `Entrada: ${item.entryAccess}, Salida: ${item.exitAccess}`,
                 tertiary: `Tipo: ${item.accessType ? 'Autorizado' : 'No Autorizado'}`,
                 additional: `Notas: ${item.accessNotes.map(note => note.note).join(', ')}`,

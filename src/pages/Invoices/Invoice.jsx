@@ -33,7 +33,7 @@ const Invoice = () => {
     ];
   
     const mappedData = initialData.map(item => ({
-      image: item.image,
+      image: "https://www.invoicesimple.com/wp-content/uploads/2024/08/AdobeStock_105177264-1.jpeg",
       secondary: `Duracion: ${item.Duracion} dias`,
       tertiary: `precio: ${item.precio}`,
       additional: `vehiclos: ${item.vehicletype}`
@@ -88,6 +88,7 @@ const Invoice = () => {
         onSearchChange={(e) => setSearchTerm(e.target.value)}
         onAddNew={handleAddNew}
       >
+        <h1 className='text-3xl font-bold'>Invoices</h1>
         <List>
           {mappedData.map((item, index) => (
             <CardItem
