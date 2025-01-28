@@ -92,19 +92,6 @@ export default function Equipments() {
     setModalOpen(true);
   };
 
-  const handleDelete = async (item) => {
-    await deleteData(item.id);
-    fetchAndUpdateData();
-  };
-
-  const handleAddNew = () => {
-    setCedula('');
-    setPersonExists(false);
-    setValidationError('');
-    setEditData({ id: '', serial: '', registrationDate: '', description: '', owner: '' });
-    setPersonId(null); // Reinicia el personId al agregar uno nuevo
-    setModalOpen(true);
-  };
 
   const handleCedulaSubmit = (e) => {
     e.preventDefault();
@@ -112,11 +99,51 @@ export default function Equipments() {
     if (person) {
       setPersonExists(true);
       setEditData({ ...editData, owner: person.name });
-      setPersonId(person.id); // Almacena el id de la persona
+      setPersonId(person.id);
+      console.log('ID de la persona encontrada:', person.id);
     } else {
       setValidationError('La cédula no existe. Por favor, registre a la persona primero.');
     }
   };
+
+  const handleAddNew = () => {
+    setCedula('');
+    setPersonExists(false);
+    setValidationError('');
+    setEditData({ id: '', serial: '', registrationDate: '', description: '', owner: '' });
+    setPersonId(null);
+    setModalOpen(true);
+    console.log('Añadiendo nuevo equipo, ID de la persona reiniciado a null.');
+  };
+
+  const handleDelete = async (item) => {
+    const ownerName = item.additional?.split(': ')[1];
+    const owner = peopleData.find(person => person.name === ownerName);
+
+    if (!owner) {
+      console.error('No se encontró el propietario del equipo.');
+      return;
+    }
+
+    const personIdToDelete = owner.id;
+
+    if (!item.id) {
+      console.error('ID del equipo indefinido:', item);
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.delete(`/people/${personIdToDelete}/removeEquipment/${item.id}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      await fetchAndUpdateData();
+    } catch (error) {
+      console.error("Error al eliminar el equipo:", error.response || error.message);
+    }
+  };
+
 
   const fields = [
     { name: 'serial', label: 'Serial', type: 'text', required: true },
@@ -146,7 +173,7 @@ export default function Equipments() {
               key={index}
               data={item}
               onEdit={handleEdit}
-              onDelete={handleDelete}
+              onDelete={() => handleDelete(item)}
             />
           ))}
         </List>
