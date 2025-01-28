@@ -3,7 +3,6 @@ import Modal from '../../components/Modal';
 import CommonLayout from '../../components/CommonLayout';
 import List from '../../components/Cards/List';
 import CardItem from '../../components/Cards/CardItem';
-import Form from '../../components/Form';
 import useApi from '../../hooks/useData';
 import UserContext from '../../Context';
 import axiosInstance from '../../Services/apiService';
@@ -13,6 +12,7 @@ const Access = () => {
   const { data: accessData, loading, error, postData, putData, deleteData } = useApi('/access');
   const { data: peopleData, loading: peopleLoading, error: peopleError } = useApi('/people');
   const { data: porterData, loading: porterLoading, error: porterError } = useApi('/porters');
+
   const [filteredData, setFilteredData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -24,13 +24,16 @@ const Access = () => {
   const [personId, setPersonId] = useState(null);
 
   useEffect(() => {
-    fetchAndUpdateData();
+    if (accessData.length && peopleData.length && porterData.length) {
+      fetchAndUpdateData();
+    }
   }, [accessData, peopleData, porterData]);
 
   const fetchAndUpdateData = async () => {
     try {
       const response = await axiosInstance.get('/access');
-      const mappedData = response.data.flatMap(access => {
+      const newAccessData = response.data;
+      const mappedData = newAccessData.flatMap(access => {
         const person = peopleData.find(p => p.id === access.people);
         const porters = access.porters.map(porterId => {
           const porter = porterData.find(p => p.id === porterId);
@@ -59,40 +62,62 @@ const Access = () => {
     }
 
     const transformedData = {
-      entryAccess: new Date().toISOString().split('T')[0], 
-      exitAccess: null, 
+      entryAccess: new Date().toISOString().split('T')[0],
+      exitAccess: null,
       accessType: true,
       people: personId,
       porters: [user.id],
-      accessNotes: [], // Omitir las notas
+      accessNotes: [],
     };
 
-    if (isEditing) {
-      try {
+    try {
+      if (isEditing) {
         const response = await axiosInstance.put(`/access/${editData.idAccess}`, transformedData, {
           headers: {
             "Content-Type": "application/json",
           },
         });
-        console.log("Acceso actualizado con éxito:", response.data);
-        fetchAndUpdateData();
-      } catch (error) {
-        console.error("Error al actualizar el acceso:", error.response || error.message);
-      }
-    } else {
-      try {
-        const response = await axiosInstance.post('/access', transformedData, {
+      } else {
+        const response = await axiosInstance.post(`/access/people/${personId}`, transformedData, {
           headers: {
             "Content-Type": "application/json",
           },
         });
         console.log("Acceso creado con éxito:", response.data);
-        fetchAndUpdateData();
-      } catch (error) {
-        console.error("Error al crear el acceso:", error.response || error.message);
+        const newAccessId = response.data.idAccess;
+
+        await axiosInstance.put(`/access/${newAccessId}/porters/${user.id}`, transformedData, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
       }
+      await fetchAndUpdateData();
+    } catch (error) {
+      console.error("Error al crear o actualizar el acceso:", error.response || error.message);
     }
 
+    resetForm();
+  };
+
+  const handleExit = async (idAccess) => {
+    const transformedData = {
+      exitAccess: new Date().toISOString().split('T')[0],
+    };
+
+    try {
+      const response = await axiosInstance.put(`/access/${idAccess}`, transformedData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      await fetchAndUpdateData();
+    } catch (error) {
+      console.error("Error al registrar la salida:", error.response || error.message);
+    }
+  };
+
+  const resetForm = () => {
     setModalOpen(false);
     setEditData({ idAccess: '', entryAccess: '', exitAccess: '', accessType: true, notes: '', porters: [] });
     setPersonExists(false);
@@ -103,22 +128,38 @@ const Access = () => {
     const secondarySplit = item.secondary.split(', ');
     const entryAccess = secondarySplit[0].split(': ')[1];
     const exitAccess = secondarySplit[1].split(': ')[1];
-
+  
     setEditData({
       idAccess: item.id,
       entryAccess: entryAccess,
       exitAccess: exitAccess,
-      accessType: item.tertiary.includes('Autorizado'),
-      porters: item.porters.split(', ')
+      accessType: item.tertiary.includes('Autorizado')
     });
     setIsEditing(true);
     setPersonExists(true);
     setModalOpen(true);
   };
+  
 
   const handleDelete = async (item) => {
-    await deleteData(item.idAccess);
-    fetchAndUpdateData();
+    console.log('Item a eliminar:', item);
+
+    if (!item.id) {
+      console.error('ID de acceso indefinido para el item:', item);
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.delete(`/access/${item.id}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("Acceso eliminado con éxito:", response.data);
+      await fetchAndUpdateData();
+    } catch (error) {
+      console.error("Error al eliminar el acceso:", error.response || error.message);
+    }
   };
 
   const handleAddNew = () => {
@@ -134,7 +175,6 @@ const Access = () => {
     e.preventDefault();
     const person = peopleData.find(p => p.cedula === cedula);
     if (person) {
-      console.log('Persona encontrada:', person);
       setPersonExists(true);
       setEditData({ ...editData, owner: person.name });
       setPersonId(person.id);
@@ -143,6 +183,10 @@ const Access = () => {
     }
   };
 
+  const filteredResults = filteredData.filter(item =>
+    item.primary.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <CommonLayout
       titleImage="https://images.pexels.com/photos/2225617/pexels-photo-2225617.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
@@ -150,21 +194,21 @@ const Access = () => {
       searchValue={searchTerm}
       onSearchChange={(e) => setSearchTerm(e.target.value)}
       onAddNew={handleAddNew}>
-        <h1 className='text-3xl font-bold'>Access</h1>
+
+      <h1 className='text-3xl font-bold'>Access</h1>
+
       {loading ? (
         <p>Cargando datos...</p>
       ) : error ? (
         <p>{error}</p>
-      ) : filteredData.length > 0 ? (
+      ) : filteredResults.length > 0 ? (
         <List>
-          {filteredData.filter(item => 
-            item.primary.toLowerCase().includes(searchTerm.toLowerCase())
-          ).map((item, index) => (
+          {filteredResults.map((item, index) => (
             <CardItem
               key={index}
               data={item}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
+              onEdit={() => handleExit(item.id)}
+              onDelete={() => handleDelete(item)}
             />
           ))}
         </List>
@@ -172,7 +216,7 @@ const Access = () => {
         <p>No se encontraron datos</p>
       )}
 
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
+      <Modal isOpen={modalOpen} onClose={resetForm}>
         {!personExists && !isEditing ? (
           <form onSubmit={handleCedulaSubmit}>
             <label>
@@ -191,10 +235,15 @@ const Access = () => {
           </form>
         ) : (
           <div>
-            <p>Registrando acceso para la cédula: {cedula}</p>
+            <p>Registrando acceso para: {editData.owner || cedula}</p>
             <button onClick={handleSubmit} className="bg-blue-600 cursor-pointer text-white px-4 py-2 rounded mt-4">
               Registrar Entrada
             </button>
+            {isEditing && !editData.exitAccess && (
+              <button onClick={() => handleExit(editData.idAccess)} className="bg-red-600 cursor-pointer text-white px-4 py-2 rounded mt-4">
+                Registrar Salida
+              </button>
+            )}
           </div>
         )}
       </Modal>
