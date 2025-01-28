@@ -1,139 +1,203 @@
-import React, { useState, useEffect } from 'react';
-import { FaBuilding, FaEdit } from "react-icons/fa";
-import { MdOutlineAddCircleOutline, MdDelete } from "react-icons/md";
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import UserContext from '../../Context';
 import Modal from '../../components/Modal';
+import Form from '../../components/FormInvoice';
 import CommonLayout from '../../components/CommonLayout';
-import List from '../../components/Cards/List'; 
+import List from '../../components/Cards/List';
 import CardItem from '../../components/Cards/CardItem';
+import useApi from '../../hooks/useData';
+import axiosInstance from '../../Services/apiService';
 
-const Invoice = () => {
-    const [data, setData] = useState([]);
-    const [filteredData, setFilteredData] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const [editData, setEditData] = useState({ id: null, Duracion: '', precio: '', vehicletype: '' });
-  
-    const initialData = [
-      {
-          id: 1,
-          Duracion: 30,
-          precio: 12.56,
-          vehicletype: "Car"
-      },
-      {
-          id: 2,
-          Duracion: 30,
-          precio: 12.56,
-          vehicletype: "Car"
-      }
-    ];
-  
-    const mappedData = initialData.map(item => ({
-      image: "https://www.invoicesimple.com/wp-content/uploads/2024/08/AdobeStock_105177264-1.jpeg",
-      secondary: `Duracion: ${item.Duracion} dias`,
-      tertiary: `precio: ${item.precio}`,
-      additional: `vehiclos: ${item.vehicletype}`
-    }));
-  
-    useEffect(() => {
-      setData(initialData);
-      setFilteredData(initialData);
-      setLoading(false);
-    }, []);
-  
-    useEffect(() => {
-      let filtered = data.filter(item =>
-        item.id.toString().toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredData(filtered);
-    }, [searchTerm, data]);
-  
-    const handleSubmit = (newData) => {
-      if (isEditing) {
-        setData(data.map(item => (item.id === newData.id ? newData : item)));
-      } else {
-        setData([...data, { ...newData, id: data.length + 1 }]);
-      }
-      setModalOpen(false);
-      setEditData({ id: null, Duracion: '', precio: '', vehicletype: '' });
-    };
-  
-    const handleEdit = (item) => {
-      setEditData(item);
-      setIsEditing(true);
-      setModalOpen(true);
-    };
-  
-    const handleDelete = (item) => {
-      const updatedData = data.filter(dataItem => dataItem.id !== item.id);
-      setData(updatedData);
-      setFilteredData(updatedData);
-    };
-  
-    const handleAddNew = () => {
-      setEditData({ id: null, Duracion: '', precio: '', vehicletype: '' });
-      setIsEditing(false);
-      setModalOpen(true);
-    };
-  
-    return (
-      <CommonLayout
-        titleImage="https://images.pexels.com/photos/6927354/pexels-photo-6927354.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-        searchPlaceholder="Search by ID"
-        searchValue={searchTerm}
-        onSearchChange={(e) => setSearchTerm(e.target.value)}
-        onAddNew={handleAddNew}
-      >
-        <h1 className='text-3xl font-bold'>Invoices</h1>
-        <List>
-          {mappedData.map((item, index) => (
-            <CardItem
-              key={index}
-              data={item}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
-          ))}
-        </List>
-  
-        <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
-          <form onSubmit={(e) => { e.preventDefault(); handleSubmit(editData); }}>
-            <div>
-              <label>Duracion:</label>
-              <input
-                type="text"
-                value={editData.Duracion}
-                onChange={(e) => setEditData({ ...editData, Duracion: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <label>Precio:</label>
-              <input
-                type="text"
-                value={editData.precio}
-                onChange={(e) => setEditData({ ...editData, precio: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <label>Tipo de vehiculo:</label>
-              <input
-                type="text"
-                value={editData.vehicletype}
-                onChange={(e) => setEditData({ ...editData, vehicletype: e.target.value })}
-                required
-              />
-            </div>
-            <button type="submit">Guardar</button>
-          </form>
-        </Modal>
-      </CommonLayout>
-    );
+export default function Invoices() {
+  const { user } = useContext(UserContext);
+  const { data: invoiceData, loading: invoiceLoading, error: invoiceError } = useApi('/invoices');
+  const { data: peopleData, loading: peopleLoading, error: peopleError } = useApi('/people');
+  const { data: porterData, loading: porterLoading, error: porterError } = useApi('/porters');
+  const { data: membershipData, loading: membershipLoading, error: membershipError } = useApi('/membership');
+
+  const [membershipId, setMembershipId] = useState(null);
+  const [filteredData, setFilteredData] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [editData, setEditData] = useState({ idInvoice: null, date: '', status: '' });
+  const [cedula, setCedula] = useState('');
+  const [personId, setPersonId] = useState(null);
+  const [validationError, setValidationError] = useState('');
+
+  useEffect(() => {
+    if (invoiceData.length && peopleData.length && porterData.length && membershipData.length) {
+      fetchAndUpdateData();
+    }
+  }, [invoiceData, peopleData, porterData, membershipData]);
+
+  const fetchAndUpdateData = async () => {
+    try {
+      const mappedData = invoiceData.map((invoice) => {
+        const person = peopleData.find((p) => p.invoices.some((inv) => inv.idInvoice === invoice.idInvoice));
+        const porters = porterData.filter((porter) =>
+          porter.invoices.some((inv) => inv.idInvoice === invoice.idInvoice)
+        );
+        const membership = membershipData.find((m) =>
+          m.invoices.some((inv) => inv.idInvoice === invoice.idInvoice)
+        );
+
+        return {
+          id: invoice.idInvoice,
+          image: 'https://www.invoicesimple.com/wp-content/uploads/2024/08/AdobeStock_105177264-1.jpeg',
+          primary: person
+            ? `${person.name} (CC. ${person.cedula})`
+            : 'Persona desconocida',
+          secondary: `Fecha: ${invoice.date}`,
+          tertiary: `Membresía: ${membership ? `$${membership.price}` : 'No aplica'}`,
+          additional: `Portero: ${porters.length > 0 ? porters.map((p) => p.name).join(', ') : 'Ninguno'
+            }`,
+        };
+      });
+      setFilteredData(mappedData);
+    } catch (error) {
+      console.error('Error al mapear los datos:', error);
+    }
   };
 
-export default Invoice
+  const handleAddNew = () => {
+    setEditData({ idInvoice: null, date: '', status: '' });
+    setIsEditing(false);
+    setPersonId(null);
+    setCedula('');
+    setValidationError('');
+    setModalOpen(true);
+  };
+
+  const handleCedulaSubmit = (e) => {
+    e.preventDefault();
+    const person = peopleData.find((p) => p.cedula === cedula);
+    if (person) {
+      setPersonId(person.id);
+      setValidationError('');
+      console.log('Persona encontrada:', person);
+    } else {
+      setValidationError('La persona no esta registrada.');
+    }
+  };
+
+  const handleSubmit = async (newData) => {
+    console.log('Submitting invoice...');
+    
+    if (!personId) {
+      setValidationError('Debes verificar la cédula primero.');
+      return;
+    }
+
+    if (!membershipId) {
+      setValidationError('Debes seleccionar una membresía.');
+      return;
+    }
+
+    const currentDate = new Date().toISOString().split('T')[0];
+    const dataToSubmit = {
+      ...newData,
+      status: true,
+      date: currentDate,
+      membership: membershipId
+    };
+
+    try {
+      const response = await axiosInstance.post(`/invoices/${personId}/people/${user.id}/porters/${membershipId}/membership`, dataToSubmit, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('Factura creada con éxito:', response.data);
+      fetchAndUpdateData();
+    } catch (error) {
+      console.error('Error al crear la factura:', error.response || error.message);
+      setValidationError('Error al crear la factura.');
+    }
+
+    setModalOpen(false);
+  };
+
+  const fields = [
+    {
+      name: 'membership',
+      label: 'Membresía',
+      type: 'select',
+      options:
+        membershipData?.map((m) => ({
+          value: m.idMembership,
+          label: `Duración: ${m.duration} meses - $${m.price}`,
+        })) || [],
+      required: true,
+    },
+  ];
+
+  return (
+    <CommonLayout
+      titleImage="https://images.pexels.com/photos/6927354/pexels-photo-6927354.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+      searchPlaceholder="Buscar por cédula o ID"
+      searchValue={searchTerm}
+      onSearchChange={(e) => setSearchTerm(e.target.value)}
+      onAddNew={handleAddNew}
+    >
+      <h1 className="text-3xl font-bold">Facturas</h1>
+
+      {invoiceLoading || peopleLoading || porterLoading || membershipLoading ? (
+        <p>Cargando datos...</p>
+      ) : invoiceError || peopleError || porterError || membershipError ? (
+        <p>Error al cargar datos</p>
+      ) : filteredData.length > 0 ? (
+        <List>
+          {filteredData
+            .filter((item) =>
+              item.primary.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            .map((item, index) => (
+              <CardItem key={index} data={item} hidden={true} />
+            ))}
+        </List>
+      ) : (
+        <p>No se encontraron facturas</p>
+      )}
+
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
+        {!personId ? (
+          <form onSubmit={handleCedulaSubmit}>
+            <label>
+              Cédula del usuario:
+              <input
+                type="text"
+                value={cedula}
+                onChange={(e) => setCedula(e.target.value)}
+                className="w-full p-2 mt-1 border border-gray-300 rounded"
+              />
+            </label>
+            {validationError && <p className="text-red-500 mt-1">{validationError}</p>}
+            <button type="submit" className="bg-blue-600 cursor-pointer text-white px-4 py-2 rounded mt-4">
+              Verificar
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={(e) => { 
+            e.preventDefault(); 
+            handleSubmit(editData); 
+          }}>
+            <Form
+              fields={fields}
+              initialData={editData}
+              onChange={(e) => {
+                setEditData({ ...editData, [e.target.name]: e.target.value });
+                if (e.target.name === 'membership') {
+                  setMembershipId(e.target.value);
+                }
+              }}
+            />
+            <button type="submit" className="bg-blue-600 cursor-pointer text-white px-4 py-2 rounded mt-4">
+              Crear Factura
+            </button>
+          </form>
+        )}
+      </Modal>
+    </CommonLayout>
+  );
+}
