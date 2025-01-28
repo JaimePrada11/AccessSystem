@@ -45,13 +45,10 @@ export default function Invoices() {
         return {
           id: invoice.idInvoice,
           image: 'https://www.invoicesimple.com/wp-content/uploads/2024/08/AdobeStock_105177264-1.jpeg',
-          primary: person
-            ? `${person.name} (CC. ${person.cedula})`
-            : 'Persona desconocida',
+          primary: person ? `${person.name} (CC. ${person.cedula})` : 'Persona desconocida',
           secondary: `Fecha: ${invoice.date}`,
           tertiary: `Membresía: ${membership ? `$${membership.price}` : 'No aplica'}`,
-          additional: `Portero: ${porters.length > 0 ? porters.map((p) => p.name).join(', ') : 'Ninguno'
-            }`,
+          additional: `Portero: ${porters.length > 0 ? porters.map((p) => p.name).join(', ') : 'Ninguno'}`,
         };
       });
       setFilteredData(mappedData);
@@ -77,13 +74,12 @@ export default function Invoices() {
       setValidationError('');
       console.log('Persona encontrada:', person);
     } else {
-      setValidationError('La persona no esta registrada.');
+      setValidationError('La persona no está registrada.');
     }
   };
 
   const handleSubmit = async (newData) => {
-    console.log('Submitting invoice...');
-    
+
     if (!personId) {
       setValidationError('Debes verificar la cédula primero.');
       return;
@@ -96,14 +92,14 @@ export default function Invoices() {
 
     const currentDate = new Date().toISOString().split('T')[0];
     const dataToSubmit = {
-      ...newData,
       status: true,
       date: currentDate,
-      membership: membershipId
     };
 
+    const endpoint = `invoices/${personId}/people/${user.id}/porters/${membershipId}/membership`;
+
     try {
-      const response = await axiosInstance.post(`/invoices/${personId}/people/${user.id}/porters/${membershipId}/membership`, dataToSubmit, {
+      const response = await axiosInstance.post(endpoint, dataToSubmit, {
         headers: {
           'Content-Type': 'application/json',
         },
