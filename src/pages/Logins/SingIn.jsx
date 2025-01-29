@@ -124,7 +124,7 @@ const SignIn = () => {
       });
 
       alert('User created successfully')
-      navigate("/login");
+      navigate("/");
 
     } catch (error) {
       console.error("Error during form submission:", error);
