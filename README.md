@@ -34,10 +34,14 @@ El proyecto estará disponible en GitHub. Puedes obtener una copia del proyecto 
    - Ve al repositorio del proyecto en GitHub.
    - Haz clic en el botón "Code" y selecciona "Download ZIP".
    - Extrae los archivos del ZIP descargado en tu máquina local.
+  
 
 Una vez que tengas una copia del proyecto, puedes seguir las instrucciones específicas de instalación y configuración incluidas en el repositorio.
 
+## Backend
 
+Para descargar el backend debe irse al siguiente repositorio
+[Backend](https://github.com/laura2ndrea/EntrySystem2) EntrySystem
 
 ## Deployment
 Mira **Deployment** para conocer cómo desplegar el proyecto.
