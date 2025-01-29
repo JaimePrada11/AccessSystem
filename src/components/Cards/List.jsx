@@ -2,12 +2,13 @@ import React from 'react'
 
 export default function List({ children }) {
   return (
-    <div className="flex flex-row flex-wrap gap-4 justify-center">
+    <ul className="flex flex-wrap items-center justify-center gap-4">
       {children.map((child, index) => (
-        <div key={index} className=" flex flex-row items-center justify-center">
+        <li key={index} className="w-full md:w-[45%] md:flex md:flex-wrap">
           {child}
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
+

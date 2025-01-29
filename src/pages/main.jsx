@@ -46,7 +46,7 @@ const MainContainer = () => {
         <div className="w-full lg:w-1/3 flex hidden items-center sm:block p-6 bg-white/10 backdrop-blur-lg rounded-xl transform transition-transform duration-300 hover:scale-105 items-center justify-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Calendar</h2>
           <div className="p-4 rounded-lg ">
-            <Calendar className="rounded-3xl text-xl bg-transparent " />
+            <Calendar className="rounded-3xl bg-transparent " />
           </div>
         </div>
       </div>

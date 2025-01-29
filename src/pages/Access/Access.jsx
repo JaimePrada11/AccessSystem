@@ -9,7 +9,7 @@ import axiosInstance from '../../Services/apiService';
 
 const Access = () => {
   const { user } = useContext(UserContext);
-  const { data: accessData, loading, error, postData, putData, deleteData } = useApi('/access');
+  const { data: accessData, loading, error } = useApi('/access');
   const { data: peopleData, loading: peopleLoading, error: peopleError } = useApi('/people');
   const { data: porterData, loading: porterLoading, error: porterError } = useApi('/porters');
 
@@ -83,7 +83,6 @@ const Access = () => {
             "Content-Type": "application/json",
           },
         });
-        console.log("Acceso creado con éxito:", response.data);
         const newAccessId = response.data.idAccess;
 
         await axiosInstance.put(`/access/${newAccessId}/porters/${user.id}`, transformedData, {
