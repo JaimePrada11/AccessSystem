@@ -1,14 +1,13 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router";
 import UserContext from "../../Context";
-import { axiosInstanceLogin } from "../../Services/apiService";
+import axiosInstance, { axiosInstanceLogin } from "../../Services/apiService";
 import useApi from "../../hooks/useData";
 import { CiUser } from "react-icons/ci";
 import { FaKey } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const Login = () => {
-    const { data: porters } = useApi("/porters");
     const { login } = useContext(UserContext);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -40,21 +39,25 @@ const Login = () => {
             const { token, userName } = response.data;
             localStorage.setItem("authToken", token);
 
-            if (porters && porters.length > 0) {
-                const userf = porters.find(
-                    (porter) => porter.user.userName === username
-                );
-
-                if (userf) {
-                    login(userf);
-                } else {
-                    login({ userName }); 
-                }
-            } else {
-                login({ userName });
+            let porters = [];
+            try {
+                const portersResponse = await axiosInstance.get("/porters", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                porters = portersResponse.data;
+            } catch (error) {
+                console.error("Error obteniendo porteros:", error);
             }
 
-            alert("Welcome ! ");
+            // 🔹 Buscar el usuario en los porteros
+            let userf = null;
+            if (porters && porters.length > 0) {
+                userf = porters.find((porter) => porter.user && porter.user.userName === username);
+            }
+
+            login(userf || { userName });
+
+            alert("Welcome!");
             navigate("/home");
 
         } catch (error) {
@@ -67,6 +70,7 @@ const Login = () => {
             }
         }
     };
+    
 
     const handleChange = (e) => {
         const { name, value } = e.target;
