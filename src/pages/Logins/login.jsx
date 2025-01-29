@@ -1,13 +1,9 @@
-import React, { useState, useContext, useEffect } from "react";
-import { CiUser } from "react-icons/ci";
-import { FaKey } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router";
-import useApi from "../../hooks/useData";
 import UserContext from "../../Context";
+import { axiosInstanceLogin } from "../../Services/apiService";
 
 const Login = () => {
-    const { data: porteros, loading, error } = useApi("/porters");
     const { login } = useContext(UserContext);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -15,29 +11,48 @@ const Login = () => {
     const [message, setMessage] = useState("");
     const navigate = useNavigate();
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
         let formErrors = {};
         if (!username) formErrors.username = "Username cannot be empty";
         if (!password) formErrors.password = "Password cannot be empty";
         setErrors(formErrors);
 
-        if (Object.keys(formErrors).length === 0) {
-            const userf = porteros.find(
-                (porter) => porter.user.userName === username && porter.user.password === password
-            );
-
-            if (userf) {
-                login(userf);
-                navigate(`/home`);
-            } else {
-                setMessage("Invalid username or password");
-            }
+        if (Object.keys(formErrors).length > 0) {
+            return;
         }
-    };
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error loading users</div>;
+        
+    axiosInstanceLogin.post("login", new URLSearchParams({ userName: username, password }))
+    .then((response) => {
+        if (!response.data || !response.data.token) {
+            setMessage("Invalid username or password");
+            return;
+        }
+
+        const { token, userName } = response.data;
+
+        // Guardar token en localStorage
+        localStorage.setItem("authToken", token);
+        
+        // Guardar usuario en el contexto
+        login({ userName });
+
+        alert("Bienvenido/a!");
+        navigate("/home");
+    })
+    .catch((error) => {
+        if (error.response) {
+            console.error("Respuesta del servidor:", error.response.data);
+            setMessage("Invalid username or password");
+        } else {
+            console.error("Error de conexión:", error.message);
+            alert("Hubo un problema al intentar conectarse con el servidor.");
+        }
+    });
+
+    };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-900 to-red-100">
@@ -79,7 +94,7 @@ const Login = () => {
                         Enter
                     </button>
                     <div className="mt-4">
-                        {message && <span className={`text-sm ${message === "Access granted" ? "text-green-500" : "text-red-500"}`}>{message}</span>}
+                        {message && <span className={`text-sm ${message === "Invalid username or password" ? "text-red-500" : "text-green-500"}`}>{message}</span>}
                     </div>
                 </form>
             </section>

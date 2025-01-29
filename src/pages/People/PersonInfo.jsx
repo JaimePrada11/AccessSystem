@@ -93,7 +93,7 @@ const UserInfo = () => {
                         <p className="text-center text-gray-600">No hay equipos disponibles</p>
                     )}
                 </div>
-                <div className="bg-white shadow-md rounded-lg p-4">
+                <div className="bg-white flex-col shadow-md rounded-lg p-4">
                     <h2 className="text-2xl font-semibold mb-4 text-center">Vehículos</h2>
                     {vehicles?.length > 0 ? (
                         <List>
@@ -111,7 +111,7 @@ const UserInfo = () => {
                         <p className="text-center text-gray-600">No hay vehículos disponibles</p>
                     )}
                 </div>
-                <div className="bg-white shadow-md rounded-lg p-4">
+                <div className="bg-white  flex-col  shadow-md rounded-lg p-4">
                     <h2 className="text-2xl font-semibold mb-4 text-center">Facturas</h2>
                     {invoices?.length > 0 ? (
                         <List>

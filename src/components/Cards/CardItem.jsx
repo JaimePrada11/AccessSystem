@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 const CardItem = ({ data, onEdit, onDelete, path, hidden }) => {
     return (
-        <div className="flex w-full  items-start space-x-6 p-6 bg-white shadow rounded border border-gray-200">
+        <div className="flex items-start space-x-6 p-6 bg-white shadow rounded border border-gray-200">
             <div className="flex flex-col items-center justify-center">
                 <Link to={path}>
                     <img src={data.image} alt="" className=" w-32 rounded-md bg-slate-100" />
